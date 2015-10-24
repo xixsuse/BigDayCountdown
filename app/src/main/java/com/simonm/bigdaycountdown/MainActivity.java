@@ -40,7 +40,6 @@ public class MainActivity extends AppCompatActivity {
         RelativeLayout main_view = (RelativeLayout) findViewById(R.id.content_main_id);
         RelativeLayout get_started_view = (RelativeLayout) findViewById(R.id.content_get_started_id);
 
-        startScreenCheck(getNumberOfDatesTracked(), get_started_view, main_view);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -85,6 +84,9 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             selectItem(0);
         }
+
+        startScreenCheck(getNumberOfDatesTracked(), get_started_view, main_view);
+
     }
     // --------- END OF OnCreate()
 
@@ -99,13 +101,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Check to see if any dates are tracked, if not -> We display a get Started Screen.
-    public void startScreenCheck(int numberOfDatesTracked, View main_view, View get_started_view){
+    public void startScreenCheck(int numberOfDatesTracked, View get_started_view, View main_view){
         // Initialize the different views
         Log.i("tag", String.valueOf(numberOfDatesTracked));
         if (numberOfDatesTracked == 0){
+            Log.i("tag", "if test ran");
+            main_view.setVisibility(View.VISIBLE);
             get_started_view.setVisibility(View.VISIBLE);
-            main_view.setVisibility(View.GONE);
+            Log.i("tag", String.valueOf(get_started_view.getVisibility()));
         } else {
+            Log.i("tag", "this does not run");
             main_view.setVisibility(View.VISIBLE);
             get_started_view.setVisibility(View.GONE);
         }

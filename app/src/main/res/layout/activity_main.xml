@@ -7,8 +7,8 @@
     tools:context=".MainActivity">
 
 
-    <include layout="@layout/content_get_started"/>
     <include layout="@layout/content_main" />
+    <include layout="@layout/content_get_started"/>
     <include layout="@layout/drawer_layout"/>
 
 </android.support.design.widget.CoordinatorLayout>
