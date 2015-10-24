@@ -1,6 +1,11 @@
 package com.simonm.bigdaycountdown;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.res.Configuration;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -15,8 +20,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -39,6 +46,9 @@ public class MainActivity extends AppCompatActivity {
 
         RelativeLayout main_view = (RelativeLayout) findViewById(R.id.content_main_id);
         RelativeLayout get_started_view = (RelativeLayout) findViewById(R.id.content_get_started_id);
+
+        Button get_started_hint1 = (Button) findViewById(R.id.hint1);
+        get_started_hint1.setOnClickListener(setGetStartedHintOnClickMethod);
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -85,10 +95,67 @@ public class MainActivity extends AppCompatActivity {
             selectItem(0);
         }
 
+        // Checking wether any dates are tracked, if not, we display a get started screen.
         startScreenCheck(getNumberOfDatesTracked(), get_started_view, main_view);
+
+
 
     }
     // --------- END OF OnCreate()
+
+
+    // Creates the cross fade from the get started view to the main view
+    private void crossfade(final View get_started_view, View main_view, int time) {
+
+        // Set the content view to 0% opacity but visible, so that it is visible
+        // (but fully transparent) during the animation.
+        main_view.setAlpha(0f);
+        main_view.setVisibility(View.VISIBLE);
+
+        // Animate the content view to 100% opacity, and clear any animation
+        // listener set on the view.
+        main_view.animate()
+                .alpha(1f)
+                .setDuration(time)
+                .setListener(null);
+
+        // Animate the loading view to 0% opacity. After the animation ends,
+        // set its visibility to GONE as an optimization step (it won't
+        // participate in layout passes, etc.)
+        get_started_view.animate()
+                .alpha(0f)
+                .setDuration(time)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        get_started_view.setVisibility(View.GONE);
+                    }
+                });
+    }
+
+    private Button.OnClickListener setGetStartedHintOnClickMethod=
+            new Button.OnClickListener(){
+                public void onClick(View v) {
+                    Log.i("tag", "got here!");
+
+                    // Initialize the vars
+                    RelativeLayout main_view = (RelativeLayout) findViewById(R.id.content_main_id);
+                    RelativeLayout get_started_view = (RelativeLayout) findViewById(R.id.content_get_started_id);
+
+                    // Retrieves and caches the systems default medium animations time.
+                    Integer mediumAnimationDuration = getResources().getInteger(
+                            android.R.integer.config_mediumAnimTime);
+
+                    // removes the onClickListener
+                    findViewById(R.id.hint1).setOnClickListener(null);
+
+                    // Fade out help screen
+                    // Fade in main screen
+                    crossfade(get_started_view, main_view, mediumAnimationDuration);
+
+
+                }
+            };
 
 
     public int getNumberOfDatesTracked() {
