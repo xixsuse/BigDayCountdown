@@ -3,9 +3,6 @@ package com.simonm.bigdaycountdown;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.res.Configuration;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -21,9 +18,14 @@ import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+
+// TODO: HIDE DRAWER BUTTON WHEN ON CREATE NEW DATE VIEW
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -44,19 +46,22 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        RelativeLayout main_view = (RelativeLayout) findViewById(R.id.content_main_id);
+        final RelativeLayout main_view = (RelativeLayout) findViewById(R.id.content_main_id);
         RelativeLayout get_started_view = (RelativeLayout) findViewById(R.id.content_get_started_id);
 
         Button get_started_hint1 = (Button) findViewById(R.id.hint1);
         get_started_hint1.setOnClickListener(setGetStartedHintOnClickMethod);
+
+        ImageView drawerButton = (ImageView) findViewById(R.id.menu_hint_button);
+        drawerButton.setOnClickListener(drawerOnClickMethod);
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                crossfade(findViewById(R.id.content_main_id), findViewById(R.id.content_add_date_id),
+                        getResources().getInteger(android.R.integer.config_mediumAnimTime));
             }
         });
 
@@ -93,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (savedInstanceState == null) {
             selectItem(0);
+            selectItem(0);
         }
 
         // Checking wether any dates are tracked, if not, we display a get started screen.
@@ -105,16 +111,16 @@ public class MainActivity extends AppCompatActivity {
 
 
     // Creates the cross fade from the get started view to the main view
-    private void crossfade(final View get_started_view, View main_view, int time) {
+    private void crossfade(final View view_to_disappear, View view_to_show, int time) {
 
         // Set the content view to 0% opacity but visible, so that it is visible
         // (but fully transparent) during the animation.
-        main_view.setAlpha(0f);
-        main_view.setVisibility(View.VISIBLE);
+        view_to_show.setAlpha(0f);
+        view_to_show.setVisibility(View.VISIBLE);
 
         // Animate the content view to 100% opacity, and clear any animation
         // listener set on the view.
-        main_view.animate()
+        view_to_show.animate()
                 .alpha(1f)
                 .setDuration(time)
                 .setListener(null);
@@ -122,16 +128,28 @@ public class MainActivity extends AppCompatActivity {
         // Animate the loading view to 0% opacity. After the animation ends,
         // set its visibility to GONE as an optimization step (it won't
         // participate in layout passes, etc.)
-        get_started_view.animate()
+        view_to_disappear.animate()
                 .alpha(0f)
                 .setDuration(time)
                 .setListener(new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationEnd(Animator animation) {
-                        get_started_view.setVisibility(View.GONE);
+                        view_to_disappear.setVisibility(View.GONE);
                     }
                 });
     }
+
+
+    private TextView.OnClickListener drawerOnClickMethod=
+            new TextView.OnClickListener(){
+                public void onClick(View v) {
+                    Log.i("tag", "opens drawer");
+
+                    // open drawer
+                    mDrawerLayout.openDrawer(mDrawerList);
+
+                }
+            };
 
     private Button.OnClickListener setGetStartedHintOnClickMethod=
             new Button.OnClickListener(){
