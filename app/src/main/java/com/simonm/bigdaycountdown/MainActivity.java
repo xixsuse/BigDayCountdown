@@ -55,6 +55,15 @@ public class MainActivity extends AppCompatActivity {
         ImageView drawerButton = (ImageView) findViewById(R.id.menu_hint_button);
         drawerButton.setOnClickListener(drawerOnClickMethod);
 
+        FloatingActionButton fab_add_date = (FloatingActionButton) findViewById(R.id.fab_add_date);
+        fab_add_date.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                crossfade(findViewById(R.id.content_add_date_id), findViewById(R.id.content_main_id),
+                        getResources().getInteger(android.R.integer.config_mediumAnimTime));
+            }
+        });
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
