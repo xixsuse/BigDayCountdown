@@ -10,5 +10,7 @@
     <string name="app_name">BigDayCountdown</string>
     <string name="action_settings">Settings</string>
     <string name="drawer_button">Drawer button</string>
-    <string name="titleforevent">Event Title</string>
+    <string name="title_for_event">Event Title</string>
+    <string name="date">Date</string>
+    <string name="background">Background</string>
 </resources>
