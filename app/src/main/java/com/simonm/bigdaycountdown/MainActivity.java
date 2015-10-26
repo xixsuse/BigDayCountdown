@@ -23,6 +23,8 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 
 // TODO: HIDE DRAWER BUTTON WHEN ON CREATE NEW DATE VIEW
 
@@ -32,6 +34,9 @@ public class MainActivity extends AppCompatActivity {
 
     // Variables
     protected int NumberOfDatesTracked;
+
+    // All current tracked dates will be stored in this arrayList.
+    protected ArrayList<trackedDate> trackedDatesList;
 
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
