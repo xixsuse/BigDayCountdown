@@ -23,13 +23,18 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.simonm.bigdaycountdown.Utils.AnimUtil;
+
 import java.util.ArrayList;
 
 
 // TODO: HIDE DRAWER BUTTON WHEN ON CREATE NEW DATE VIEW
 
+// FOR THE TODO, I'D RECOMMEND ADD A BOOL AND THEN USING SOMETHING LIKE
+//mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
-public class MainActivity extends AppCompatActivity {
+
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
 
     // Variables
@@ -45,40 +50,46 @@ public class MainActivity extends AppCompatActivity {
     protected CharSequence mTitle;
     private String[] menuTitles;
 
+    private RelativeLayout main_view;
+    private RelativeLayout get_started_view;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
 
-        final RelativeLayout main_view = (RelativeLayout) findViewById(R.id.content_main_id);
-        RelativeLayout get_started_view = (RelativeLayout) findViewById(R.id.content_get_started_id);
+        initViews();
+        setupDrawer();
+
+        if (savedInstanceState == null) {
+            selectItem(0);
+            selectItem(0);
+        }
+
+        // Checking wether any dates are tracked, if not, we display a get started screen.
+        startScreenCheck(getNumberOfDatesTracked(), get_started_view, main_view);
+
+    }
+
+    private void initViews(){
+        main_view = (RelativeLayout) findViewById(R.id.content_main_id);
+        get_started_view = (RelativeLayout) findViewById(R.id.content_get_started_id);
 
         Button get_started_hint1 = (Button) findViewById(R.id.hint1);
-        get_started_hint1.setOnClickListener(setGetStartedHintOnClickMethod);
+        get_started_hint1.setOnClickListener(this);
 
         ImageView drawerButton = (ImageView) findViewById(R.id.menu_hint_button);
-        drawerButton.setOnClickListener(drawerOnClickMethod);
+        drawerButton.setOnClickListener(this);
 
         FloatingActionButton fab_add_date = (FloatingActionButton) findViewById(R.id.fab_add_date);
-        fab_add_date.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                crossfade(findViewById(R.id.content_add_date_id), findViewById(R.id.content_main_id),
-                        getResources().getInteger(android.R.integer.config_mediumAnimTime));
-            }
-        });
+        fab_add_date.setOnClickListener(this);
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                crossfade(findViewById(R.id.content_main_id), findViewById(R.id.content_add_date_id),
-                        getResources().getInteger(android.R.integer.config_mediumAnimTime));
-            }
-        });
-
+        fab.setOnClickListener(this);
+    }
+    private void setupDrawer(){
         menuTitles = getResources().getStringArray(R.array.menu_array);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
@@ -99,7 +110,8 @@ public class MainActivity extends AppCompatActivity {
                 null,  /* Dont have a toolbar */
                 R.string.drawer_open,  /* "open drawer" description for accessibility */
                 R.string.drawer_close  /* "close drawer" description for accessibility */
-        ) {
+        )
+        {
             public void onDrawerClosed(View view) {
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
@@ -109,85 +121,41 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
+    }
 
-        if (savedInstanceState == null) {
-            selectItem(0);
-            selectItem(0);
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.fab:
+                AnimUtil.crossfade(main_view, findViewById(R.id.content_add_date_id), getResources().getInteger(android.R.integer.config_mediumAnimTime));
+                break;
+            case R.id.fab_add_date:
+                AnimUtil.crossfade(findViewById(R.id.content_add_date_id), main_view, getResources().getInteger(android.R.integer.config_mediumAnimTime));
+                break;
+            case R.id.hint1:
+                Log.i("tag", "got here!");
+
+                // Retrieves and caches the systems default medium animations time.
+                Integer mediumAnimationDuration = getResources().getInteger(android.R.integer.config_mediumAnimTime);
+
+                // removes the onClickListener
+                findViewById(R.id.hint1).setOnClickListener(null);
+
+                // Fade out help screen
+                // Fade in main screen
+                AnimUtil.crossfade(get_started_view, main_view, mediumAnimationDuration);
+                break;
+            case R.id.menu_hint_button:
+                Log.i("tag", "opens drawer");
+
+                // open drawer
+                mDrawerLayout.openDrawer(mDrawerList);
+                break;
+
         }
-
-        // Checking wether any dates are tracked, if not, we display a get started screen.
-        startScreenCheck(getNumberOfDatesTracked(), get_started_view, main_view);
-
-
-
-    }
-    // --------- END OF OnCreate()
-
-
-    // Creates the cross fade from the get started view to the main view
-    private void crossfade(final View view_to_disappear, View view_to_show, int time) {
-
-        // Set the content view to 0% opacity but visible, so that it is visible
-        // (but fully transparent) during the animation.
-        view_to_show.setAlpha(0f);
-        view_to_show.setVisibility(View.VISIBLE);
-
-        // Animate the content view to 100% opacity, and clear any animation
-        // listener set on the view.
-        view_to_show.animate()
-                .alpha(1f)
-                .setDuration(time)
-                .setListener(null);
-
-        // Animate the loading view to 0% opacity. After the animation ends,
-        // set its visibility to GONE as an optimization step (it won't
-        // participate in layout passes, etc.)
-        view_to_disappear.animate()
-                .alpha(0f)
-                .setDuration(time)
-                .setListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        view_to_disappear.setVisibility(View.GONE);
-                    }
-                });
     }
 
-
-    private TextView.OnClickListener drawerOnClickMethod=
-            new TextView.OnClickListener(){
-                public void onClick(View v) {
-                    Log.i("tag", "opens drawer");
-
-                    // open drawer
-                    mDrawerLayout.openDrawer(mDrawerList);
-
-                }
-            };
-
-    private Button.OnClickListener setGetStartedHintOnClickMethod=
-            new Button.OnClickListener(){
-                public void onClick(View v) {
-                    Log.i("tag", "got here!");
-
-                    // Initialize the vars
-                    RelativeLayout main_view = (RelativeLayout) findViewById(R.id.content_main_id);
-                    RelativeLayout get_started_view = (RelativeLayout) findViewById(R.id.content_get_started_id);
-
-                    // Retrieves and caches the systems default medium animations time.
-                    Integer mediumAnimationDuration = getResources().getInteger(
-                            android.R.integer.config_mediumAnimTime);
-
-                    // removes the onClickListener
-                    findViewById(R.id.hint1).setOnClickListener(null);
-
-                    // Fade out help screen
-                    // Fade in main screen
-                    crossfade(get_started_view, main_view, mediumAnimationDuration);
-
-
-                }
-            };
 
 
     public int getNumberOfDatesTracked() {
@@ -200,10 +168,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Check to see if any dates are tracked, if not -> We display a get Started Screen.
-    public void startScreenCheck(int numberOfDatesTracked, View get_started_view, View main_view){
+    public void startScreenCheck(int numberOfDatesTracked, View get_started_view, View main_view) {
         // Initialize the different views
         Log.i("tag", String.valueOf(numberOfDatesTracked));
-        if (numberOfDatesTracked == 0){
+        if (numberOfDatesTracked == 0) {
             Log.i("tag", "if test ran");
             main_view.setVisibility(View.VISIBLE);
             get_started_view.setVisibility(View.VISIBLE);
@@ -239,7 +207,7 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         // Handle action buttons
-        switch(item.getItemId()) {
+        switch (item.getItemId()) {
         }
         return super.onOptionsItemSelected(item);
     }
