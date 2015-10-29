@@ -1,11 +1,11 @@
 package com.simonm.bigdaycountdown;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
+import android.app.DialogFragment;
+import android.app.FragmentManager;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -21,20 +21,22 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.simonm.bigdaycountdown.Utils.AnimUtil;
 
 import java.util.ArrayList;
 
 
-// TODO: HIDE DRAWER BUTTON WHEN ON CREATE NEW DATE VIEW
+/*  TODO:
+    Put background text + background preview in a container. Make the container clickable.
+    On click Choose from: Take picture with camera, choose from library or choose from a album
+    of stock photos from the app.
+ */
 
-// FOR THE TODO, I'D RECOMMEND ADD A BOOL AND THEN USING SOMETHING LIKE
-//mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+// TODO: Try to implement a date picker in the date select field.
 
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends FragmentActivity implements View.OnClickListener {
 
 
     // Variables
@@ -67,9 +69,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             selectItem(0);
         }
 
-        // Checking wether any dates are tracked, if not, we display a get started screen.
+        // Checking whether any dates are tracked, if not, we display a get started screen.
         startScreenCheck(getNumberOfDatesTracked(), get_started_view, main_view);
 
+    }
+
+    // Displays the date picker when the date field is clicked:
+    public void showDatePickerDialog(View v) {
+        DialogFragment newFragment = new DatePickerFragment();
+        // TODO: How does FragmentManagers work? Where should I define a Fragmentmanager for this,
+        // and how do I do it?
+        // http://developer.android.com/guide/topics/ui/controls/pickers.html
+        newFragment.show(getSupportFragmentManager(), "myFragmentManager");
     }
 
     private void initViews(){
@@ -97,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // set a custom shadow that overlays the main content when the drawer opens
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
         // set up the drawer's list view with items and click listener
-        mDrawerList.setAdapter(new ArrayAdapter<String>(this,
+        mDrawerList.setAdapter(new ArrayAdapter<>(this,
                 R.layout.drawer_list_item, menuTitles));
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
@@ -212,7 +223,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return super.onOptionsItemSelected(item);
     }
 
-    /* The click listner for ListView in the navigation drawer */
+    /* The click listener for ListView in the navigation drawer */
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -248,7 +259,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        // Pass any configuration change to the drawer toggls
+        // Pass any configuration change to the drawer toggle
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
