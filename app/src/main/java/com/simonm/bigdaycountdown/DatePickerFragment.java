@@ -24,7 +24,6 @@ public class DatePickerFragment extends DialogFragment
 
 
     public void onDateSet(DatePicker view, int year, int month, int day) {
-        // TODO:
-        // Put the date in a temp variable which I will use later when I create the date Object.
+
     }
 }

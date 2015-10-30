@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         newFragment.show(getFragmentManager(), "myFragmentManager");
     }
 
-    //TODO: Pass the values from the datePicker to here and display the date to the user.
+    //TODO: Pass the values from the datePicker into this class and display the date to the user.
 
     private void initViews(){
         main_view = (RelativeLayout) findViewById(R.id.content_main_id);
