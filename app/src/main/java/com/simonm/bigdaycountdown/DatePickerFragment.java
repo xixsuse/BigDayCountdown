@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.os.Bundle;
 import android.widget.DatePicker;
-
 import java.util.Calendar;
 
 public class DatePickerFragment extends DialogFragment
@@ -23,8 +22,9 @@ public class DatePickerFragment extends DialogFragment
         return new DatePickerDialog(getActivity(), this, year, month, day);
     }
 
+
     public void onDateSet(DatePicker view, int year, int month, int day) {
         // TODO:
-        // Do something with the date chosen by the user
+        // Put the date in a temp variable which I will use later when I create the date Object.
     }
 }

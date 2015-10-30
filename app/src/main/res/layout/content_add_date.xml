@@ -8,7 +8,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:background="@mipmap/get_started_background"
-    android:visibility="gone"
+    android:visibility="visible"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/activity_main" tools:context=".MainActivity">
 
@@ -44,43 +44,65 @@
             android:layout_gravity="center_horizontal"
             android:hint="@string/title_for_event" />
 
-        <EditText
+
+        <TextView
             android:layout_below="@id/new_title_id"
+            android:text="@string/date"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
-            android:hint="@string/date"
-            android:inputType="date"
             android:onClick="showDatePickerDialog"
             android:textAlignment="center"
             android:ems="10"
+            android:textAppearance="?android:attr/textAppearanceMedium"
             android:id="@+id/new_date_id"
             android:layout_gravity="center_horizontal" />
+
+
+            <!-- Here I neeed to find the color that is the same as the
+            Standard color Value for texts and editTexts for the underine -->
+        <View
+            android:layout_height="1dp"
+            android:layout_below="@id/new_date_id"
+            android:layout_width="fill_parent"
+            android:background="#606060" />
 
 
         <RelativeLayout android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/new_date_id"
+            android:layout_marginTop="5dp"
             >
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/background"
-                android:id="@+id/background_select_text"
-                android:layout_marginStart="20dp"/>
 
             <ImageView
+                android:contentDescription="@string/background"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_alignParentEnd="true"
                 android:src="@android:color/holo_blue_light"
                 android:id="@+id/background_preview"
                 android:layout_marginEnd="20dp"
-
                 />
+
+            <TextView
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/background"
+                android:id="@+id/select_background_text"
+                android:layout_marginStart="20dp"
+                android:layout_alignTop="@id/background_preview"
+                android:layout_marginTop="10dp"/>
+
+        <View
+            android:layout_height="1dp"
+            android:layout_below="@id/background_preview"
+            android:layout_marginTop="5dp"
+            android:layout_width="fill_parent"
+            android:background="#606060" />
         </RelativeLayout>
+
 
 
     </RelativeLayout>

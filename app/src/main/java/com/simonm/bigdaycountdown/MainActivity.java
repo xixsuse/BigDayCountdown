@@ -1,11 +1,9 @@
 package com.simonm.bigdaycountdown;
 
 import android.app.DialogFragment;
-import android.app.FragmentManager;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -21,6 +19,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.simonm.bigdaycountdown.Utils.AnimUtil;
 
@@ -33,17 +32,15 @@ import java.util.ArrayList;
     of stock photos from the app.
  */
 
-// TODO: Try to implement a date picker in the date select field.
 
-
-public class MainActivity extends FragmentActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
 
     // Variables
     protected int NumberOfDatesTracked;
 
     // All current tracked dates will be stored in this arrayList.
-    protected ArrayList<trackedDate> trackedDatesList;
+    protected ArrayList<TrackedDate> trackedDatesList;
 
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
@@ -74,14 +71,14 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
     }
 
+
     // Displays the date picker when the date field is clicked:
     public void showDatePickerDialog(View v) {
         DialogFragment newFragment = new DatePickerFragment();
-        // TODO: How does FragmentManagers work? Where should I define a Fragmentmanager for this,
-        // and how do I do it?
-        // http://developer.android.com/guide/topics/ui/controls/pickers.html
-        newFragment.show(getSupportFragmentManager(), "myFragmentManager");
+        newFragment.show(getFragmentManager(), "myFragmentManager");
     }
+
+    //TODO: Pass the values from the datePicker to here and display the date to the user.
 
     private void initViews(){
         main_view = (RelativeLayout) findViewById(R.id.content_main_id);
