@@ -2,13 +2,21 @@ package com.simonm.bigdaycountdown;
 
 import android.app.DatePickerDialog;
 import android.app.DialogFragment;
+import android.content.Intent;
 import android.content.res.Configuration;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.Image;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Layout;
 import android.util.Log;
 import android.view.MenuInflater;
 import android.view.View;
@@ -73,6 +81,41 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    private final static int SELECT_PHOTO = 12345;
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Here we need to check if the activity that was triggers was the Image Gallery.
+        // If it is the requestCode will match the LOAD_IMAGE_RESULTS value.
+        // If the resultCode is RESULT_OK and there is some data we know that an image was picked.
+        if (requestCode == SELECT_PHOTO && resultCode == RESULT_OK && data != null) {
+            // Let's read picked image data - its URI
+            Uri pickedImage = data.getData();
+            // Let's read picked image path using content resolver
+            String[] filePath = { MediaStore.Images.Media.DATA };
+            Cursor cursor = getContentResolver().query(pickedImage, filePath, null, null, null);
+            cursor.moveToFirst();
+            String imagePath = cursor.getString(cursor.getColumnIndex(filePath[0]));
+
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+            Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
+
+            ImageView background_preview = (ImageView) findViewById(R.id.background_preview);
+            background_preview.setImageBitmap(bitmap);
+
+            // Do something with the bitmap
+
+
+            // At the end remember to close the cursor or you will end with the RuntimeException!
+            cursor.close();
+        }
+    }
+
+
 
     // Displays the date picker when the date field is clicked:
     public void showDatePickerDialog(View v) {
@@ -105,7 +148,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(this);
+
+        RelativeLayout imagePicker = (RelativeLayout) findViewById(R.id.background_picker);
+        imagePicker.setOnClickListener(this);
+
+
     }
+
+
     private void setupDrawer(){
         menuTitles = getResources().getStringArray(R.array.menu_array);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -169,6 +219,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // open drawer
                 mDrawerLayout.openDrawer(mDrawerList);
                 break;
+
+            case R.id.background_picker:
+                new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+                    photoPickerIntent.setType("image/*");
+                    startActivityForResult(photoPickerIntent, SELECT_PHOTO);
+                }
+            };
 
         }
     }
