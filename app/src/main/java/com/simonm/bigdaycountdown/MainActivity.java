@@ -1,5 +1,6 @@
 package com.simonm.bigdaycountdown;
 
+import android.app.DatePickerDialog;
 import android.app.DialogFragment;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -33,7 +35,7 @@ import java.util.ArrayList;
  */
 
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener{
 
 
     // Variables
@@ -78,7 +80,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         newFragment.show(getFragmentManager(), "myFragmentManager");
     }
 
-    //TODO: Pass the values from the datePicker into this class and display the date to the user.
+    public void onDateSet(DatePicker view, int year, int month, int day){
+        TextView myEventDate = (TextView) findViewById(R.id.new_date_id);
+        String strYear = String.valueOf(year);
+        String strMonth = String.valueOf(month);
+        String strDay = String.valueOf(day);
+        myEventDate.setText(strYear + '-' + strMonth + '-' + strDay);
+    }
+
 
     private void initViews(){
         main_view = (RelativeLayout) findViewById(R.id.content_main_id);
