@@ -34,6 +34,9 @@ import android.widget.TextView;
 import com.simonm.bigdaycountdown.Utils.AnimUtil;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 
 /*  TODO:
@@ -47,10 +50,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     // Variables
+
+    private final static int SELECT_PHOTO = 12345;
+
     protected int NumberOfDatesTracked;
 
     // All current tracked dates will be stored in this arrayList.
-    protected ArrayList<TrackedDate> trackedDatesList;
+    protected ArrayList<TrackedDate> myTrackedDatesList;
 
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
@@ -81,7 +87,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    private final static int SELECT_PHOTO = 12345;
+
+    protected void addEvent(Date date, String eventTitle, boolean alert){
+        myTrackedDatesList.add(new TrackedDate(alert, eventTitle, date));
+        // Not working atm, need to make the trackedDates comparable.
+        Collections.sort(myTrackedDatesList);
+
+    }
+
+
 
 
     @Override
@@ -199,6 +213,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.fab_add_date:
                 AnimUtil.crossfade(findViewById(R.id.content_add_date_id), main_view, getResources().getInteger(android.R.integer.config_mediumAnimTime));
+                // Creates a new date object and displays it. (Work in progress)
                 break;
             case R.id.hint1:
                 Log.i("tag", "got here!");
