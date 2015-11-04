@@ -33,10 +33,13 @@ import android.widget.TextView;
 
 import com.simonm.bigdaycountdown.Utils.AnimUtil;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+
+import pl.aprilapps.easyphotopicker.EasyImage;
 
 
 /*  TODO:
@@ -48,10 +51,10 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener{
 
+    // Temporary variables to store values before TrackedDate object is created and put in the List.
+    protected File tempBackground;
 
     // Variables
-
-    private final static int SELECT_PHOTO = 12345;
 
     protected int NumberOfDatesTracked;
 
@@ -96,37 +99,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-
-
+    // For the background selection
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        // Here we need to check if the activity that was triggers was the Image Gallery.
-        // If it is the requestCode will match the LOAD_IMAGE_RESULTS value.
-        // If the resultCode is RESULT_OK and there is some data we know that an image was picked.
-        if (requestCode == SELECT_PHOTO && resultCode == RESULT_OK && data != null) {
-            // Let's read picked image data - its URI
-            Uri pickedImage = data.getData();
-            // Let's read picked image path using content resolver
-            String[] filePath = { MediaStore.Images.Media.DATA };
-            Cursor cursor = getContentResolver().query(pickedImage, filePath, null, null, null);
-            cursor.moveToFirst();
-            String imagePath = cursor.getString(cursor.getColumnIndex(filePath[0]));
+        EasyImage.handleActivityResult(requestCode, resultCode, data, this, new EasyImage.Callbacks() {
+            @Override
+            public void onImagePickerError(Exception e, EasyImage.ImageSource source) {
+                //Some error handling
+            }
 
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-            Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
+            @Override
+            public void onImagePicked(File imageFile, EasyImage.ImageSource source) {
+                //Handle the image
+                // Temporary store the image to later set it in the TrackedDate object.
 
-            ImageView background_preview = (ImageView) findViewById(R.id.background_preview);
-            background_preview.setImageBitmap(bitmap);
-
-            // Do something with the bitmap
-
-
-            // At the end remember to close the cursor or you will end with the RuntimeException!
-            cursor.close();
-        }
+                tempBackground = imageFile;
+            }
+        });
     }
 
 
@@ -163,8 +154,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(this);
 
-        RelativeLayout imagePicker = (RelativeLayout) findViewById(R.id.background_picker);
-        imagePicker.setOnClickListener(this);
+        ImageView cameraButton = (ImageView) findViewById(R.id.camera_button);
+        cameraButton.setOnClickListener(this);
+
+        ImageView galleryButton = (ImageView) findViewById(R.id.gallery_button);
+        galleryButton.setOnClickListener(this);
 
 
     }
@@ -235,17 +229,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mDrawerLayout.openDrawer(mDrawerList);
                 break;
 
-            case R.id.background_picker:
-                new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
-                    photoPickerIntent.setType("image/*");
-                    startActivityForResult(photoPickerIntent, SELECT_PHOTO);
-                }
-            };
+            case R.id.camera_button:
+                onTakePhotoClicked();
+                break;
+
+            case R.id.gallery_button:
+                onPickFromGaleryClicked();
+                break;
 
         }
+    }
+
+    protected void onTakePhotoClicked() {
+        EasyImage.openCamera(this);
+    }
+
+    protected void onPickFromGaleryClicked() {
+        EasyImage.openGalleryPicker(this);
     }
 
 

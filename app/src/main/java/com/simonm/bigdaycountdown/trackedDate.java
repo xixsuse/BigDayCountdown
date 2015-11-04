@@ -1,6 +1,7 @@
 package com.simonm.bigdaycountdown;
 
 import java.util.Date;
+import java.util.Objects;
 
 
 public class TrackedDate implements Comparable{
@@ -21,11 +22,12 @@ public class TrackedDate implements Comparable{
     }
 
 
-    // Why does this not satisfy the Comparable?
-    public int compareTo(TrackedDate another) {
-        if (this.getDate() == null || another.getDate() == null)
+    //TODO: Test this comparison.
+    @Override
+    public int compareTo(Object another) {
+        TrackedDate td = (TrackedDate)another;
+        if (this.getDate() == null || td.getDate() == null)
             return 0;
-        return this.getDate().compareTo(another.getDate());
+        return this.getDate().compareTo(td.getDate());
     }
-
 }
