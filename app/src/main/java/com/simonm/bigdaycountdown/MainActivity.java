@@ -26,6 +26,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -53,6 +54,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     // Temporary variables to store values before TrackedDate object is created and put in the List.
     protected File tempBackground;
+    protected boolean alert;
+    protected int tempYear;
+    protected int tempMonth;
+    protected int tempDay;
+    protected Date tempDate;
+
 
     // Variables
 
@@ -91,14 +98,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    protected void addEvent(Date date, String eventTitle, boolean alert){
-        myTrackedDatesList.add(new TrackedDate(alert, eventTitle, date));
-        // Not working atm, need to make the trackedDates comparable.
-        Collections.sort(myTrackedDatesList);
-
-    }
-
-
     // For the background selection
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -130,6 +129,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void onDateSet(DatePicker view, int year, int month, int day){
         TextView myEventDate = (TextView) findViewById(R.id.new_date_id);
+        tempYear = year;
+        tempMonth = month;
+        tempDay = day;
         String strYear = String.valueOf(year);
         String strMonth = String.valueOf(month);
         String strDay = String.valueOf(day);
@@ -208,6 +210,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.fab_add_date:
                 AnimUtil.crossfade(findViewById(R.id.content_add_date_id), main_view, getResources().getInteger(android.R.integer.config_mediumAnimTime));
                 // Creates a new date object and displays it. (Work in progress)
+                // TODO: Create the new TrackedDate Object!
+                createAndStoreNewEvent();
                 break;
             case R.id.hint1:
                 Log.i("tag", "got here!");
@@ -238,6 +242,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
         }
+    }
+
+    protected void createAndStoreNewEvent(){
+        EditText tempEventTitleEditText = (EditText) findViewById(R.id.new_title_id);
+        String newEventTitle = tempEventTitleEditText.getText().toString();
+        // TODO: Why does it complain here? "Date is deprecated" ??
+        tempDate = new Date(tempYear, tempMonth, tempDay);
+
+        validateInput(newEventTitle, tempBackground, tempDate);
+
+        TrackedDate newEvent = new TrackedDate(alert, newEventTitle, tempDate, tempBackground);
+        myTrackedDatesList.add(newEvent);
+        Collections.sort(myTrackedDatesList);
+    }
+
+    protected void validateInput(String title, File backGround, Date date){
+        //TODO:
+        // Background image
+        // Event title
+        // Date
+
     }
 
     protected void onTakePhotoClicked() {

@@ -1,17 +1,20 @@
 package com.simonm.bigdaycountdown;
 
+import java.io.File;
 import java.util.Date;
-import java.util.Objects;
 
 
 public class TrackedDate implements Comparable{
 
-    public TrackedDate(boolean alert, String eventTitle, Date date) {
+    public TrackedDate(boolean alert, String eventTitle, Date date, File backGround) {
         this.alert = alert;
         this.eventTitle = eventTitle;
         this.date = date;
+        this.backGround = backGround;
     }
 
+
+    protected File backGround;
     protected String eventTitle;
     protected Date date;
     protected boolean alert;
