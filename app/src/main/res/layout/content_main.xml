@@ -29,5 +29,85 @@
         android:layout_centerVertical="true"
         android:layout_alignParentStart="true" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textSize="50sp"
+        android:text="00"
+        android:layout_marginRight="10dp"
+        android:id="@+id/day"
+        android:layout_alignTop="@id/month"
+        android:layout_toStartOf="@id/month"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="@string/days"
+        android:id="@+id/dayText"
+        android:layout_below="@id/day"
+        android:layout_alignEnd="@id/day" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textSize="50sp"
+        android:text="00"
+        android:layout_marginRight="10dp"
+        android:id="@+id/month"
+        android:layout_alignTop="@+id/year"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="@string/months"
+        android:id="@+id/monthText"
+        android:layout_below="@id/month"
+        android:layout_alignEnd="@id/month" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textSize="50sp"
+        android:layout_marginTop="20dp"
+        android:layout_below="@id/eventName"
+        android:text="00"
+        android:id="@+id/year"
+        android:layout_toEndOf="@id/month" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="@string/years"
+        android:id="@+id/yearText"
+        android:layout_below="@id/year"
+        android:layout_alignEnd="@id/year" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:layout_marginBottom="10dp"
+        android:text="@string/timeleft"
+        android:id="@+id/timeUntilText"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Event Name!"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/eventName"
+        android:layout_below="@+id/timeUntilText" />
+
 
 </RelativeLayout>

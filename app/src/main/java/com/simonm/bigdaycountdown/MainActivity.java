@@ -4,19 +4,12 @@ import android.app.DatePickerDialog;
 import android.app.DialogFragment;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.Image;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Layout;
 import android.util.Log;
 import android.view.MenuInflater;
 import android.view.View;
@@ -38,15 +31,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
-
 import pl.aprilapps.easyphotopicker.EasyImage;
 
 
 /*  TODO:
-    Put background text + background preview in a container. Make the container clickable.
-    On click Choose from: Take picture with camera, choose from library or choose from a album
-    of stock photos from the app.
+    Add new drawer on right hand side where you can choose which event you track on your screen.
  */
 
 
