@@ -65,8 +65,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     protected int NumberOfDatesTracked;
 
+
+
     // All current tracked dates will be stored in this arrayList.
-    protected ArrayList<TrackedDate> myTrackedDatesList;
+
+    protected ArrayList<TrackedDate> myTrackedDatesList ;
 
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
@@ -86,6 +89,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         initViews();
         setupDrawer();
+        initVars();
 
         if (savedInstanceState == null) {
             selectItem(0);
@@ -119,7 +123,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
 
+    // GETTERS & SETTERS
+    public ArrayList<TrackedDate> getMyTrackedDatesList() {
+        return myTrackedDatesList;
+    }
 
+
+    // Initializes variables
+    protected void initVars(){
+        if (getMyTrackedDatesList() == null){
+            myTrackedDatesList = new ArrayList<>();
+        }
+        // Else we already have a list containing tracked events
+    }
 
     // Displays the date picker when the date field is clicked:
     public void showDatePickerDialog(View v) {
@@ -253,8 +269,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         validateInput(newEventTitle, tempBackground, tempDate);
 
         TrackedDate newEvent = new TrackedDate(alert, newEventTitle, tempDate, tempBackground);
+        Log.i("tag", newEvent.getDate().toString());
         myTrackedDatesList.add(newEvent);
         Collections.sort(myTrackedDatesList);
+
+        //TODO:
+        // I should maybe reset the vars for the new date object after creating it.
+
     }
 
     protected void validateInput(String title, File backGround, Date date){
