@@ -29,25 +29,38 @@ import com.simonm.bigdaycountdown.Utils.AnimUtil;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
+
 import pl.aprilapps.easyphotopicker.EasyImage;
 
 
 /*  TODO:
     Add new drawer on right hand side where you can choose which event you track on your screen.
+
+    If moths / years is 0 dont show it.
+
+    Fix layout on remaining time
  */
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener{
 
-    // Temporary variables to store values before TrackedDate object is created and put in the List.
+    // Temporary variables to store values before TrackedEvent object is created and put in the List.
     protected File tempBackground;
     protected boolean alert;
     protected int tempYear;
     protected int tempMonth;
     protected int tempDay;
     protected Date tempDate;
+
+    // To be used by currently chosen event
+    protected File eventBackground;
+    protected Date eventDate;
+
+    protected TrackedEvent currentEvent;
 
 
     // Variables
@@ -58,14 +71,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     // All current tracked dates will be stored in this arrayList.
 
-    protected ArrayList<TrackedDate> myTrackedDatesList ;
+    protected ArrayList<TrackedEvent> myTrackedEventsList;
+    protected List<String> eventNames = new ArrayList<>();
 
     private DrawerLayout mDrawerLayout;
+
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
+    private ListView eDrawerList;
+    private ActionBarDrawerToggle eDrawerToggle;
+
 
     protected CharSequence mTitle;
     private String[] menuTitles;
+
+    private CharSequence eTitle;
+    private String[] eventTitles;
+
 
     private RelativeLayout main_view;
     private RelativeLayout get_started_view;
@@ -77,7 +99,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         initViews();
-        setupDrawer();
+        setupLeftDrawer();
+        setupRightDrawer();
         initVars();
 
         if (savedInstanceState == null) {
@@ -105,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onImagePicked(File imageFile, EasyImage.ImageSource source) {
                 //Handle the image
-                // Temporary store the image to later set it in the TrackedDate object.
+                // Temporary store the image to later set it in the TrackedEvent object.
 
                 tempBackground = imageFile;
             }
@@ -113,15 +136,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     // GETTERS & SETTERS
-    public ArrayList<TrackedDate> getMyTrackedDatesList() {
-        return myTrackedDatesList;
+    public ArrayList<TrackedEvent> getMyTrackedEventsList() {
+        return myTrackedEventsList;
     }
 
 
     // Initializes variables
     protected void initVars(){
-        if (getMyTrackedDatesList() == null){
-            myTrackedDatesList = new ArrayList<>();
+        if (getMyTrackedEventsList() == null){
+            myTrackedEventsList = new ArrayList<>();
         }
         // Else we already have a list containing tracked events
     }
@@ -154,6 +177,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ImageView drawerButton = (ImageView) findViewById(R.id.menu_hint_button);
         drawerButton.setOnClickListener(this);
 
+        ImageView eDrawerButton = (ImageView) findViewById(R.id.event_hint_button);
+        eDrawerButton.setOnClickListener(this);
+
         FloatingActionButton fab_add_date = (FloatingActionButton) findViewById(R.id.fab_add_date);
         fab_add_date.setOnClickListener(this);
 
@@ -171,17 +197,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    private void setupDrawer(){
+    private void setupLeftDrawer(){
         menuTitles = getResources().getStringArray(R.array.menu_array);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
 
         // set a custom shadow that overlays the main content when the drawer opens
+        // START Implies left side
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
         // set up the drawer's list view with items and click listener
         mDrawerList.setAdapter(new ArrayAdapter<>(this,
                 R.layout.drawer_list_item, menuTitles));
-        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+        mDrawerList.setOnItemClickListener(new DrawerItemClickListener("menu"));
 
 
         // ActionBarDrawerToggle ties together the the proper interactions
@@ -189,7 +216,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mDrawerToggle = new ActionBarDrawerToggle(
                 this,                  /* host Activity */
                 mDrawerLayout,         /* DrawerLayout object */
-                null,  /* Dont have a toolbar */
+                null,  /* Don't have a toolbar */
                 R.string.drawer_open,  /* "open drawer" description for accessibility */
                 R.string.drawer_close  /* "close drawer" description for accessibility */
         )
@@ -205,6 +232,58 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mDrawerLayout.setDrawerListener(mDrawerToggle);
     }
 
+    private void setupRightDrawer(){
+        // TODO: Change this to hold the events instead
+        if (eventNames.size() == 0) {
+            eventTitles = getResources().getStringArray(R.array.events_array);
+        } else {
+            eventTitles = new String[eventNames.size()];
+            eventTitles = eventNames.toArray(eventTitles);
+        }
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        eDrawerList = (ListView) findViewById(R.id.right_drawer);
+
+        // set a custom shadow that overlays the main content when the drawer opens
+        // END Implies right hand side
+        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.END);
+        // set up the drawer's list view with items and click listener
+        eDrawerList.setAdapter(new ArrayAdapter<>(this,
+                R.layout.drawer_list_item, eventTitles));
+        eDrawerList.setOnItemClickListener(new DrawerItemClickListener("events"));
+
+
+        // ActionBarDrawerToggle ties together the the proper interactions
+        // between the sliding drawer and the action bar app icon
+        eDrawerToggle = new ActionBarDrawerToggle(
+                this,                  /* host Activity */
+                mDrawerLayout,         /* DrawerLayout object */
+                null,  /* Don't have a toolbar */
+                R.string.drawer_open,  /* "open drawer" description for accessibility */
+                R.string.drawer_close  /* "close drawer" description for accessibility */
+        )
+        {
+            public void onDrawerClosed(View view) {
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+
+            public void onDrawerOpened(View drawerView) {
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+        };
+        mDrawerLayout.setDrawerListener(eDrawerToggle);
+    }
+
+    private void updateEventDrawer() {
+        if (eventNames.size() == 0) {
+            eventTitles = getResources().getStringArray(R.array.events_array);
+        } else {
+            eventTitles = new String[eventNames.size()];
+            eventTitles = eventNames.toArray(eventTitles);
+        }
+        eDrawerList.setAdapter(new ArrayAdapter<>(this,
+                R.layout.drawer_list_item, eventTitles));
+    }
+
 
     @Override
     public void onClick(View v) {
@@ -215,7 +294,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.fab_add_date:
                 AnimUtil.crossfade(findViewById(R.id.content_add_date_id), main_view, getResources().getInteger(android.R.integer.config_mediumAnimTime));
                 // Creates a new date object and displays it. (Work in progress)
-                // TODO: Create the new TrackedDate Object!
+                // TODO: Create the new TrackedEvent Object!
                 createAndStoreNewEvent();
                 break;
             case R.id.hint1:
@@ -238,6 +317,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mDrawerLayout.openDrawer(mDrawerList);
                 break;
 
+            case R.id.event_hint_button:
+                Log.i("tag", "opens drawer");
+
+                // open drawer
+                mDrawerLayout.openDrawer(eDrawerList);
+                break;
+
             case R.id.camera_button:
                 onTakePhotoClicked();
                 break;
@@ -255,20 +341,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // TODO: Why does it complain here? "Date is deprecated" ??
         tempDate = new Date(tempYear, tempMonth, tempDay);
 
-        validateInput(newEventTitle, tempBackground, tempDate);
+        if (validateInput(newEventTitle, tempBackground, tempDate)) {
 
-        TrackedDate newEvent = new TrackedDate(alert, newEventTitle, tempDate, tempBackground);
-        Log.i("tag", newEvent.getDate().toString());
-        myTrackedDatesList.add(newEvent);
-        Collections.sort(myTrackedDatesList);
+            TrackedEvent newEvent = new TrackedEvent(alert, newEventTitle, tempDate, tempBackground);
+            Log.i("tag", newEvent.getDate().toString());
+            myTrackedEventsList.add(newEvent);
+            Collections.sort(myTrackedEventsList);
 
-        //TODO:
-        // I should maybe reset the vars for the new date object after creating it.
-
+            //TODO:
+            // I should maybe reset the vars for the new date object after creating it.
+            resetVariables();
+            eventNames.add(newEventTitle);
+            updateEventDrawer();
+        }
     }
 
-    protected void validateInput(String title, File backGround, Date date){
+    private void resetVariables() {
+        //TODO :)
+    }
+
+    protected boolean validateInput(String title, File backGround, Date date){
         //TODO:
+        if (title.equals("")){
+            return false;
+        }
+
+        return  true;
         // Background image
         // Event title
         // Date
@@ -341,24 +439,46 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     /* The click listener for ListView in the navigation drawer */
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
+        String name;
+        public DrawerItemClickListener(String name){
+            this.name = name;
+        }
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            selectItem(position);
+            Log.i("tag", String.valueOf(position));
+            if (this.name.equals("events")){
+                selectEventItem(position);
+
+            } else if (this.name.equals("menu")){
+                selectItem(position);
+            }
         }
     }
 
     private void selectItem(int position) {
 
-        // update selected item and title, then close the drawer
+        // Update, then close the drawer
         mDrawerList.setItemChecked(position, true);
-        setTitle(menuTitles[position]);
         mDrawerLayout.closeDrawer(mDrawerList);
     }
 
-    @Override
-    public void setTitle(CharSequence title) {
-        mTitle = title;
+    private void selectEventItem(int position) {
+        if (eventNames.size() != 0) {
+            currentEvent = myTrackedEventsList.get(position);
+            // update selected item and title, then close the drawer
+            eDrawerList.setItemChecked(position, true);
+            mDrawerLayout.closeDrawer(eDrawerList);
+            ((TextView) findViewById(R.id.eventName)).setText(currentEvent.getEventTitle());
+            List<String> remainingDaysMonthsYears = getDateDifferenceInList(new Date(), currentEvent.getDate());
+            ((TextView) findViewById(R.id.year)).setText(remainingDaysMonthsYears.get(2));
+            ((TextView) findViewById(R.id.month)).setText(remainingDaysMonthsYears.get(1));
+            ((TextView) findViewById(R.id.day)).setText(remainingDaysMonthsYears.get(0));
+            Log.i("Tag", "Selected event with index" + String.valueOf(position));
+        } else {
+            mDrawerLayout.closeDrawer(eDrawerList);
+        }
     }
+
 
     /**
      * When using the ActionBarDrawerToggle, you must call it during
@@ -378,5 +498,51 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // Pass any configuration change to the drawer toggle
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
+
+    private List<String> getDateDifferenceInList(Date from, Date to) {
+        List<String> tmp = new ArrayList<>();
+        Calendar fromDate=Calendar.getInstance();
+        Calendar toDate=Calendar.getInstance();
+        fromDate.setTime(from);
+        toDate.setTime(to);
+        int increment = 0;
+        int year,month,day;
+        System.out.println(fromDate.getActualMaximum(Calendar.DAY_OF_MONTH));
+        if (fromDate.get(Calendar.DAY_OF_MONTH) > toDate.get(Calendar.DAY_OF_MONTH)) {
+            increment =fromDate.getActualMaximum(Calendar.DAY_OF_MONTH);
+        }
+        System.out.println("increment"+increment);
+// DAY CALCULATION
+        if (increment != 0) {
+            day = (toDate.get(Calendar.DAY_OF_MONTH) + increment) - fromDate.get(Calendar.DAY_OF_MONTH);
+            increment = 1;
+        } else {
+            day = toDate.get(Calendar.DAY_OF_MONTH) - fromDate.get(Calendar.DAY_OF_MONTH);
+        }
+
+// MONTH CALCULATION
+        if ((fromDate.get(Calendar.MONTH) + increment) > toDate.get(Calendar.MONTH)) {
+            month = (toDate.get(Calendar.MONTH) + 12) - (fromDate.get(Calendar.MONTH) + increment);
+            increment = 1;
+        } else {
+            month = (toDate.get(Calendar.MONTH)) - (fromDate.get(Calendar.MONTH) + increment);
+            increment = 0;
+        }
+
+// YEAR CALCULATION
+        // TODO: I really don't know about this. toDate just seems to get a +1900 somewhere...
+        year = toDate.get(Calendar.YEAR)-1900 - (fromDate.get(Calendar.YEAR) + increment);
+        Log.i("year", String.valueOf(year));
+        Log.i("to", String.valueOf(toDate.get(Calendar.YEAR)));
+        Log.i("from", String.valueOf(fromDate.get(Calendar.YEAR)));
+
+
+        tmp.add(String.valueOf(day));
+        tmp.add(String.valueOf(month));
+        tmp.add(String.valueOf(year));
+
+        return tmp;
+    }
+
 
 }

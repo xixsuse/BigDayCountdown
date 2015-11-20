@@ -4,9 +4,9 @@ import java.io.File;
 import java.util.Date;
 
 
-public class TrackedDate implements Comparable{
+public class TrackedEvent implements Comparable{
 
-    public TrackedDate(boolean alert, String eventTitle, Date date, File backGround) {
+    public TrackedEvent(boolean alert, String eventTitle, Date date, File backGround) {
         this.alert = alert;
         this.eventTitle = eventTitle;
         this.date = date;
@@ -20,6 +20,19 @@ public class TrackedDate implements Comparable{
     protected boolean alert;
     // Background..
 
+
+    public boolean isAlert() {
+        return alert;
+    }
+
+    public File getBackGround() {
+        return backGround;
+    }
+
+    public String getEventTitle() {
+        return eventTitle;
+    }
+
     public Date getDate() {
         return date;
     }
@@ -28,7 +41,7 @@ public class TrackedDate implements Comparable{
     //TODO: Test this comparison.
     @Override
     public int compareTo(Object another) {
-        TrackedDate td = (TrackedDate)another;
+        TrackedEvent td = (TrackedEvent)another;
         if (this.getDate() == null || td.getDate() == null)
             return 0;
         return this.getDate().compareTo(td.getDate());

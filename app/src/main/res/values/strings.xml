@@ -5,6 +5,11 @@
         <item>About</item>
     </string-array>
 
+    <string-array name="events_array">
+        <item>No events yet!</item>
+        <item>No events yet!</item>
+    </string-array>
+
     <string name="drawer_open">Open settings drawer</string>
     <string name="drawer_close">Close settings drawer</string>
     <string name="app_name">BigDayCountdown</string>

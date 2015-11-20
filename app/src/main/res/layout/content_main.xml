@@ -37,6 +37,16 @@
         android:layout_centerVertical="true"
         android:layout_alignParentStart="true" />
 
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/drawer_button"
+        android:id="@+id/event_hint_button"
+        android:src="@android:drawable/ic_media_play"
+        android:layout_centerVertical="true"
+        android:layout_alignParentEnd="true"
+        android:scaleX="-1"/>
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
