@@ -562,7 +562,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // Hide years and/or months if remaining == 0:
     protected void hideIfNoneRemaining(List<String> date){
         if (yearsRemainingIs0(Integer.valueOf(date.get(0)))){
-            ((TextView) findViewById(R.id.yearText)).setVisibility(GONE);
+            //((TextView) findViewById(R.id.yearText)).setVisibility(GONE);
         }
     }
 
