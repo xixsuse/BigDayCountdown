@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:id="@+id/content_add_date_id"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:background="@mipmap/get_started_background"
+    android:visibility="gone"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:showIn="@layout/activity_main" tools:context=".MainActivity">
+
+    <android.support.design.widget.FloatingActionButton android:id="@+id/fab_add_date"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:src="@android:drawable/ic_menu_edit"
+        android:layout_marginBottom="16dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
+
+
+
+    <RelativeLayout
+        android:orientation="vertical"
+        android:background="@drawable/add_date_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="40dp"
+        android:layout_above="@+id/fab_add_date"
+        android:layout_marginBottom="20dp"
+        >
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:layout_marginTop="5dp"
+            android:id="@+id/new_title_id"
+            android:singleLine="true"
+            android:maxLength="20"
+            android:layout_gravity="center_horizontal"
+            android:hint="@string/title_for_event" />
+
+
+        <TextView
+            android:id="@+id/new_date_id"
+            android:layout_below="@id/new_title_id"
+            android:text="@string/date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:onClick="showDatePickerDialog"
+            android:textAlignment="center"
+            android:ems="10"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_gravity="center_horizontal" />
+
+
+            <!-- Here I neeed to find the color that is the same as the
+            Standard color Value for texts and editTexts for the underine -->
+        <View
+            android:layout_height="1dp"
+            android:layout_below="@id/new_date_id"
+            android:layout_width="fill_parent"
+            android:background="#606060" />
+
+
+        <RelativeLayout android:layout_width="match_parent"
+            android:id="@+id/wrapper"
+            android:layout_height="match_parent"
+            android:layout_below="@id/new_date_id"
+            android:layout_marginTop="5dp"
+            >
+
+
+            <ImageView
+                android:contentDescription="@string/background"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentEnd="true"
+                android:src="@android:color/holo_blue_light"
+                android:id="@+id/camera_button"
+                android:layout_marginEnd="20dp"
+                />
+
+            <ImageView
+                android:contentDescription="@string/background"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_toLeftOf="@id/camera_button"
+                android:src="@android:color/holo_green_light"
+                android:id="@+id/gallery_button"
+                android:layout_marginEnd="20dp"
+                />
+
+            <TextView
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/background"
+                android:id="@+id/select_background_text"
+                android:layout_marginStart="20dp"
+                android:layout_alignTop="@id/camera_button"
+                android:layout_marginTop="10dp"/>
+
+        <View
+            android:layout_height="1dp"
+            android:layout_below="@id/camera_button"
+            android:layout_marginTop="5dp"
+            android:layout_width="fill_parent"
+            android:background="#606060" />
+        </RelativeLayout>
+
+
+
+    </RelativeLayout>
+
+
+</RelativeLayout>
