@@ -2,11 +2,12 @@ package com.simonm.bigdaycountdown;
 
 import java.io.File;
 import java.util.Date;
+import org.joda.time.DateTime;
 
 
 public class TrackedEvent implements Comparable{
 
-    public TrackedEvent(boolean alert, String eventTitle, Date date, File backGround) {
+    public TrackedEvent(boolean alert, String eventTitle, DateTime date, File backGround) {
         this.alert = alert;
         this.eventTitle = eventTitle;
         this.date = date;
@@ -16,7 +17,7 @@ public class TrackedEvent implements Comparable{
 
     protected File backGround;
     protected String eventTitle;
-    protected Date date;
+    protected DateTime date;
     protected boolean alert;
     // Background..
 
@@ -33,7 +34,7 @@ public class TrackedEvent implements Comparable{
         return eventTitle;
     }
 
-    public Date getDate() {
+    public DateTime getDate() {
         return date;
     }
 

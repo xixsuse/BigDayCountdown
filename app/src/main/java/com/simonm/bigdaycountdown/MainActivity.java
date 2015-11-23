@@ -1,6 +1,8 @@
 package com.simonm.bigdaycountdown;
 
 import android.app.DatePickerDialog;
+import org.joda.time.DateTime;
+import org.joda.time.Days;
 import android.app.DialogFragment;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -38,11 +40,9 @@ import pl.aprilapps.easyphotopicker.EasyImage;
 
 
 /*  TODO:
-    Add new drawer on right hand side where you can choose which event you track on your screen.
 
-    If moths / years is 0 dont show it.
-
-    Fix layout on remaining time
+    List is sorted so that earliest dates appear first, but the text in the list does not update with
+    the dates. This will be tricky I think.
  */
 
 
@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected int tempYear;
     protected int tempMonth;
     protected int tempDay;
-    protected Date tempDate;
+    protected DateTime tempDate;
 
     // To be used by currently chosen event
     protected File eventBackground;
@@ -155,13 +155,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         newFragment.show(getFragmentManager(), "myFragmentManager");
     }
 
+    // DateTime months and days are 0 indexed, DatePicker months are 0 indexed, not days ???
     public void onDateSet(DatePicker view, int year, int month, int day){
         TextView myEventDate = (TextView) findViewById(R.id.new_date_id);
         tempYear = year;
-        tempMonth = month;
-        tempDay = day;
+        tempMonth = month +1;
+        tempDay = day + 1;
         String strYear = String.valueOf(year);
-        String strMonth = String.valueOf(month);
+        String strMonth = String.valueOf(tempMonth);
         String strDay = String.valueOf(day);
         myEventDate.setText(strYear + '-' + strMonth + '-' + strDay);
     }
@@ -338,8 +339,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void createAndStoreNewEvent(){
         EditText tempEventTitleEditText = (EditText) findViewById(R.id.new_title_id);
         String newEventTitle = tempEventTitleEditText.getText().toString();
-        // TODO: Why does it complain here? "Date is deprecated" ??
-        tempDate = new Date(tempYear, tempMonth, tempDay);
+        // DateTime days and months are 0 indexed. Handled when I set tempMonth and tempDay
+        tempDate = new DateTime(tempYear, tempMonth, tempDay, 0, 0);
 
         if (validateInput(newEventTitle, tempBackground, tempDate)) {
 
@@ -360,7 +361,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //TODO :)
     }
 
-    protected boolean validateInput(String title, File backGround, Date date){
+    protected boolean validateInput(String title, File backGround, DateTime date){
         //TODO:
         if (title.equals("")){
             return false;
@@ -469,14 +470,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             eDrawerList.setItemChecked(position, true);
             mDrawerLayout.closeDrawer(eDrawerList);
             ((TextView) findViewById(R.id.eventName)).setText(currentEvent.getEventTitle());
-            List<String> remainingDaysMonthsYears = getDateDifferenceInList(new Date(), currentEvent.getDate());
-            ((TextView) findViewById(R.id.year)).setText(remainingDaysMonthsYears.get(2));
-            ((TextView) findViewById(R.id.month)).setText(remainingDaysMonthsYears.get(1));
-            ((TextView) findViewById(R.id.day)).setText(remainingDaysMonthsYears.get(0));
+            int remainingDays = getDayDifference(new Date(), currentEvent.getDate());
+            // Set remaining days
+            ((TextView) findViewById(R.id.day)).setText(String.valueOf(remainingDays));
             Log.i("Tag", "Selected event with index" + String.valueOf(position));
         } else {
             mDrawerLayout.closeDrawer(eDrawerList);
         }
+    }
+
+    private int getDayDifference(Date start, DateTime end) {
+        Log.i("FirtDay", String.valueOf(start));
+        Log.i("LastDay", String.valueOf(end));
+        Log.i("daysBetween", String.valueOf(Days.daysBetween(new DateTime(start), new DateTime(end)).getDays()));
+        return Days.daysBetween(new DateTime(start), end).getDays();
     }
 
 
@@ -499,6 +506,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
+    // This will probably not be used as I am going to only use days in the beginning atleast
     private List<String> getDateDifferenceInList(Date from, Date to) {
         List<String> tmp = new ArrayList<>();
         Calendar fromDate=Calendar.getInstance();
@@ -512,7 +520,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             increment =fromDate.getActualMaximum(Calendar.DAY_OF_MONTH);
         }
         System.out.println("increment"+increment);
-// DAY CALCULATION
+        // DAY CALCULATION
         if (increment != 0) {
             day = (toDate.get(Calendar.DAY_OF_MONTH) + increment) - fromDate.get(Calendar.DAY_OF_MONTH);
             increment = 1;
@@ -520,7 +528,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             day = toDate.get(Calendar.DAY_OF_MONTH) - fromDate.get(Calendar.DAY_OF_MONTH);
         }
 
-// MONTH CALCULATION
+        // MONTH CALCULATION
         if ((fromDate.get(Calendar.MONTH) + increment) > toDate.get(Calendar.MONTH)) {
             month = (toDate.get(Calendar.MONTH) + 12) - (fromDate.get(Calendar.MONTH) + increment);
             increment = 1;
@@ -529,7 +537,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             increment = 0;
         }
 
-// YEAR CALCULATION
+        // YEAR CALCULATION
         // TODO: I really don't know about this. toDate just seems to get a +1900 somewhere...
         year = toDate.get(Calendar.YEAR)-1900 - (fromDate.get(Calendar.YEAR) + increment);
         Log.i("year", String.valueOf(year));
@@ -544,27 +552,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return tmp;
     }
 
-    // Check if years remaining is 0:
-    protected boolean yearsRemainingIs0(int years){
-        return years == 0;
-    }
 
-    // Check if months remaining is 0:
-    protected boolean monthsRemainingIs0(int months){
-        return months == 0;
-    }
-
-    // Check if days remaining is 0:
-    protected boolean daysRemainingIs0(int days){
-        return days == 0;
-    }
-
-    // Hide years and/or months if remaining == 0:
-    protected void hideIfNoneRemaining(List<String> date){
-        if (yearsRemainingIs0(Integer.valueOf(date.get(0)))){
-            //((TextView) findViewById(R.id.yearText)).setVisibility(GONE);
-        }
-    }
 
 
 }
