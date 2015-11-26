@@ -24,8 +24,7 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Event Name!"
         android:layout_centerHorizontal="true"
-        android:id="@+id/eventName"
-        android:layout_below="@+id/timeUntilText" />
+        android:id="@+id/eventName" />
 
 
     <ImageView
@@ -60,19 +59,38 @@
         android:layout_centerHorizontal="true" />
 
 
-
-    <TextView
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="@string/days_remaining"
-        android:id="@+id/dayText"
+        android:gravity="center_horizontal"
+        android:layout_centerHorizontal="true"
         android:layout_below="@id/day"
-        android:layout_centerHorizontal="true"/>
+        android:orientation="horizontal" >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/days"
+            android:id="@+id/dayText"
+            android:layout_marginEnd="5dp" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/remainingOrHasPassed"
+            android:id="@+id/remainingOrHasPassed"
+            android:layout_toEndOf="@+id/dayText"
+            android:layout_centerHorizontal="true"/>
+    </RelativeLayout>
 
-
-
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/deleteButton"
+        android:src="@android:drawable/ic_delete"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true" />
 
 
 </RelativeLayout>

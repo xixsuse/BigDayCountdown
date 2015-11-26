@@ -7,7 +7,6 @@
 
     <string-array name="events_array">
         <item>No events yet!</item>
-        <item>No events yet!</item>
     </string-array>
 
     <string name="drawer_open">Open settings drawer</string>
@@ -23,4 +22,7 @@
     <string name="years">years</string>
     <string name="timeleft">Time left until</string>
     <string name="days_remaining">Days remaining</string>
+    <string name="remainingOrHasPassed">"remaining"</string>
+    <string name="remaining">"remaining"</string>
+    <string name="hasPassed">"has passed"</string>
 </resources>

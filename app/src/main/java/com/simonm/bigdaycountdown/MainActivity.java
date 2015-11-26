@@ -6,6 +6,7 @@ import org.joda.time.Days;
 import android.app.DialogFragment;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.GravityCompat;
@@ -37,13 +38,6 @@ import java.util.Date;
 import java.util.List;
 
 import pl.aprilapps.easyphotopicker.EasyImage;
-
-
-/*  TODO:
-
-    List is sorted so that earliest dates appear first, but the text in the list does not update with
-    the dates. This will be tricky I think.
- */
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener{
@@ -194,6 +188,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ImageView galleryButton = (ImageView) findViewById(R.id.gallery_button);
         galleryButton.setOnClickListener(this);
 
+        ImageView deleteButton = (ImageView) findViewById(R.id.deleteButton);
+        deleteButton.setOnClickListener(this);
+
 
     }
 
@@ -290,6 +287,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.fab:
+                resetVariables();
                 AnimUtil.crossfade(main_view, findViewById(R.id.content_add_date_id), getResources().getInteger(android.R.integer.config_mediumAnimTime));
                 break;
             case R.id.fab_add_date:
@@ -333,6 +331,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 onPickFromGaleryClicked();
                 break;
 
+            case R.id.deleteButton:
+                deleteEvent();
+                break;
+
         }
     }
 
@@ -340,25 +342,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         EditText tempEventTitleEditText = (EditText) findViewById(R.id.new_title_id);
         String newEventTitle = tempEventTitleEditText.getText().toString();
         // DateTime days and months are 0 indexed. Handled when I set tempMonth and tempDay
-        tempDate = new DateTime(tempYear, tempMonth, tempDay, 0, 0);
-
+        tempDate = new DateTime(tempYear, tempMonth, tempDay - 1, 0, 0);
+        Log.i("day", String.valueOf(tempDay));
         if (validateInput(newEventTitle, tempBackground, tempDate)) {
 
             TrackedEvent newEvent = new TrackedEvent(alert, newEventTitle, tempDate, tempBackground);
+            currentEvent = newEvent;
             Log.i("tag", newEvent.getDate().toString());
             myTrackedEventsList.add(newEvent);
             Collections.sort(myTrackedEventsList);
 
-            //TODO:
-            // I should maybe reset the vars for the new date object after creating it.
-            resetVariables();
             eventNames.add(newEventTitle);
             updateEventDrawer();
         }
+        eventNames.clear();
+        for (TrackedEvent element:myTrackedEventsList){
+            eventNames.add(element.getEventTitle());
+        }
+        updateEventDrawer();
+        updateUI();
+
     }
 
     private void resetVariables() {
-        //TODO :)
+        ((TextView) findViewById(R.id.new_date_id)).setText(R.string.date);
+        ((EditText) findViewById(R.id.new_title_id)).setText("");
+        ((EditText) findViewById(R.id.new_title_id)).setHint(R.string.title_for_event);
     }
 
     protected boolean validateInput(String title, File backGround, DateTime date){
@@ -469,21 +478,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             // update selected item and title, then close the drawer
             eDrawerList.setItemChecked(position, true);
             mDrawerLayout.closeDrawer(eDrawerList);
-            ((TextView) findViewById(R.id.eventName)).setText(currentEvent.getEventTitle());
-            int remainingDays = getDayDifference(new Date(), currentEvent.getDate());
-            // Set remaining days
-            ((TextView) findViewById(R.id.day)).setText(String.valueOf(remainingDays));
+            updateUI();
             Log.i("Tag", "Selected event with index" + String.valueOf(position));
         } else {
             mDrawerLayout.closeDrawer(eDrawerList);
         }
     }
 
-    private int getDayDifference(Date start, DateTime end) {
+    protected  void updateUI(){
+
+        ((TextView) findViewById(R.id.eventName)).setText(currentEvent.getEventTitle());
+        DateTime currentDate = new DateTime();
+        DateTime currentDateTime0 = new DateTime(currentDate.getYear(), currentDate.getMonthOfYear(), currentDate.getDayOfMonth(), 0, 0);
+        int remainingDays = getDayDifference(currentDateTime0, currentEvent.getDate());
+        Log.i("remainingDays", String.valueOf(getDayDifference(currentDateTime0, currentEvent.getDate())));
+        Log.i("remainingDays", String.valueOf(remainingDays));
+        // Set remaining days
+        if (remainingDays < 0){
+            ((TextView) findViewById(R.id.remainingOrHasPassed)).setText(R.string.hasPassed);
+        } else {
+            ((TextView) findViewById(R.id.remainingOrHasPassed)).setText(R.string.remaining);
+        }
+        ((TextView) findViewById(R.id.day)).setText(String.valueOf(Math.abs(remainingDays)));
+    }
+
+
+    private int getDayDifference(DateTime start, DateTime end) {
         Log.i("FirtDay", String.valueOf(start));
         Log.i("LastDay", String.valueOf(end));
         Log.i("daysBetween", String.valueOf(Days.daysBetween(new DateTime(start), new DateTime(end)).getDays()));
-        return Days.daysBetween(new DateTime(start), end).getDays();
+        return Days.daysBetween(start, end).getDays();
     }
 
 
@@ -552,7 +576,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return tmp;
     }
 
+    protected void deleteEvent(){
+        if (currentEvent != null) {
+            eventNames.remove(currentEvent.getEventTitle());
+            myTrackedEventsList.remove(currentEvent);
+            currentEvent = null;
+            Collections.sort(myTrackedEventsList);
+            if (myTrackedEventsList.size() > 0){
+                currentEvent = myTrackedEventsList.get(0);
+                updateUI();
+            }
+            updateEventDrawer();
+        }
 
+        if (myTrackedEventsList.size() == 0){
+            resetUI();
+            updateEventDrawer();
+        }
+
+    }
+
+    private void resetUI() {
+        ((TextView) findViewById(R.id.eventName)).setText(R.string.title_for_event);
+        ((TextView) findViewById(R.id.day)).setText("00");
+    }
 
 
 }
