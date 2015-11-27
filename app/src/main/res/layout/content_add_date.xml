@@ -78,25 +78,24 @@
             >
 
 
-            <ImageView
+
+            <RelativeLayout
                 android:contentDescription="@string/background"
-                android:layout_width="40dp"
+                android:layout_width="100dp"
                 android:layout_height="40dp"
                 android:layout_alignParentEnd="true"
-                android:src="@android:color/holo_blue_light"
-                android:id="@+id/camera_button"
-                android:layout_marginEnd="20dp"
+                android:background="@android:color/holo_blue_light"
+                android:id="@+id/gallery_button"
+                android:layout_marginEnd="20dp">
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:gravity="center"
+                    android:text="@string/gallery"
                 />
 
-            <ImageView
-                android:contentDescription="@string/background"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_toLeftOf="@id/camera_button"
-                android:src="@android:color/holo_green_light"
-                android:id="@+id/gallery_button"
-                android:layout_marginEnd="20dp"
-                />
+            </RelativeLayout>
 
             <TextView
                 android:layout_width="250dp"
@@ -105,12 +104,12 @@
                 android:text="@string/background"
                 android:id="@+id/select_background_text"
                 android:layout_marginStart="20dp"
-                android:layout_alignTop="@id/camera_button"
+                android:layout_alignTop="@id/gallery_button"
                 android:layout_marginTop="10dp"/>
 
         <View
             android:layout_height="1dp"
-            android:layout_below="@id/camera_button"
+            android:layout_below="@id/gallery_button"
             android:layout_marginTop="5dp"
             android:layout_width="fill_parent"
             android:background="#606060" />

@@ -9,7 +9,6 @@
 
     <include layout="@layout/content_main" />
     <include layout="@layout/content_add_date"/>
-    <include layout="@layout/content_get_started"/>
 
     <!-- android:layout_gravity="start" tells DrawerLayout to treat
          this as a sliding drawer on the left side for left-to-right

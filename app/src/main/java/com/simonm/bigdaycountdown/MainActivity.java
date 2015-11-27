@@ -7,7 +7,6 @@ import android.app.DialogFragment;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.GravityCompat;
@@ -21,7 +20,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -85,7 +83,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private RelativeLayout main_view;
-    private RelativeLayout get_started_view;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +94,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setupLeftDrawer();
         setupRightDrawer();
         initVars();
+        checkEventsEmpty();
 
         if (savedInstanceState == null) {
             selectItem(0);
@@ -104,9 +102,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         // Checking whether any dates are tracked, if not, we display a get started screen.
-        startScreenCheck(getNumberOfDatesTracked(), get_started_view, main_view);
+        startScreenCheck(getNumberOfDatesTracked(), main_view);
 
     }
+
 
 
     // For the background selection
@@ -124,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onImagePicked(File imageFile, EasyImage.ImageSource source) {
                 //Handle the image
                 // Temporary store the image to later set it in the TrackedEvent object.
-
+                
                 tempBackground = imageFile;
             }
         });
@@ -165,10 +164,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void initViews(){
         main_view = (RelativeLayout) findViewById(R.id.content_main_id);
-        get_started_view = (RelativeLayout) findViewById(R.id.content_get_started_id);
-
-        Button get_started_hint1 = (Button) findViewById(R.id.hint1);
-        get_started_hint1.setOnClickListener(this);
 
         ImageView drawerButton = (ImageView) findViewById(R.id.menu_hint_button);
         drawerButton.setOnClickListener(this);
@@ -183,10 +178,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(this);
 
-        ImageView cameraButton = (ImageView) findViewById(R.id.camera_button);
-        cameraButton.setOnClickListener(this);
-
-        ImageView galleryButton = (ImageView) findViewById(R.id.gallery_button);
+        RelativeLayout galleryButton = (RelativeLayout) findViewById(R.id.gallery_button);
         galleryButton.setOnClickListener(this);
 
         ImageView deleteButton = (ImageView) findViewById(R.id.deleteButton);
@@ -297,19 +289,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // TODO: Create the new TrackedEvent Object!
                 createAndStoreNewEvent();
                 break;
-            case R.id.hint1:
-                Log.i("tag", "got here!");
-
-                // Retrieves and caches the systems default medium animations time.
-                Integer mediumAnimationDuration = getResources().getInteger(android.R.integer.config_mediumAnimTime);
-
-                // removes the onClickListener
-                findViewById(R.id.hint1).setOnClickListener(null);
-
-                // Fade out help screen
-                // Fade in main screen
-                AnimUtil.crossfade(get_started_view, main_view, mediumAnimationDuration);
-                break;
             case R.id.menu_hint_button:
                 Log.i("tag", "opens drawer");
 
@@ -322,10 +301,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 // open drawer
                 mDrawerLayout.openDrawer(eDrawerList);
-                break;
-
-            case R.id.camera_button:
-                onTakePhotoClicked();
                 break;
 
             case R.id.gallery_button:
@@ -405,18 +380,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     // Check to see if any dates are tracked, if not -> We display a get Started Screen.
-    public void startScreenCheck(int numberOfDatesTracked, View get_started_view, View main_view) {
+    public void startScreenCheck(int numberOfDatesTracked, View main_view) {
         // Initialize the different views
         Log.i("tag", String.valueOf(numberOfDatesTracked));
         if (numberOfDatesTracked == 0) {
             Log.i("tag", "if test ran");
             main_view.setVisibility(View.VISIBLE);
-            get_started_view.setVisibility(View.VISIBLE);
-            Log.i("tag", String.valueOf(get_started_view.getVisibility()));
         } else {
             Log.i("tag", "this does not run");
             main_view.setVisibility(View.VISIBLE);
-            get_started_view.setVisibility(View.GONE);
         }
 
     }
@@ -493,8 +465,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         DateTime currentDate = new DateTime();
         DateTime currentDateTime0 = new DateTime(currentDate.getYear(), currentDate.getMonthOfYear(), currentDate.getDayOfMonth(), 0, 0);
         int remainingDays = getDayDifference(currentDateTime0, currentEvent.getDate());
+
+        Drawable eventBG = Drawable.createFromPath(currentEvent.getBackGround().getAbsolutePath());
         //TODO: I have to make the File into a Drawable. This is the file I get from the EasyImagePicker (Line 112)
-        ((RelativeLayout) findViewById(R.id.content_main_id)).setBackground(currentEvent.getBackGround());
+        ((RelativeLayout) findViewById(R.id.content_main_id)).setBackground(eventBG);
         Log.i("remainingDays", String.valueOf(getDayDifference(currentDateTime0, currentEvent.getDate())));
         Log.i("remainingDays", String.valueOf(remainingDays));
         // Set remaining days
@@ -596,13 +570,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (myTrackedEventsList.size() == 0){
             resetUI();
             updateEventDrawer();
+            noEventsUI();
         }
+
+
+        findViewById(R.id.content_main_id).setBackgroundResource(R.drawable.background);
 
     }
 
     private void resetUI() {
         ((TextView) findViewById(R.id.eventName)).setText(R.string.title_for_event);
         ((TextView) findViewById(R.id.day)).setText("00");
+    }
+
+    private void noEventsUI(){
+        ((TextView) findViewById(R.id.eventName)).setText("");
+        ((TextView) findViewById(R.id.day)).setText("");
+        ((TextView) findViewById(R.id.remainingOrHasPassed)).setText("");
+        ((TextView) findViewById(R.id.dayText)).setText(R.string.noEvents);
+
+    }
+
+    private void checkEventsEmpty() {
+        if (myTrackedEventsList.size() == 0){
+            noEventsUI();
+        } else {
+            ((TextView) findViewById(R.id.dayText)).setText(R.string.days);
+        }
     }
 
 

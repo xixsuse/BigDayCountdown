@@ -25,4 +25,6 @@
     <string name="remainingOrHasPassed">"remaining"</string>
     <string name="remaining">"remaining"</string>
     <string name="hasPassed">"has passed"</string>
+    <string name="noEvents">Add a new event to track!</string>
+    <string name="gallery">Gallery</string>
 </resources>
