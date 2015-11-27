@@ -6,6 +6,7 @@ import org.joda.time.Days;
 import android.app.DialogFragment;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.drawable.Drawable;
 import android.media.Image;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -376,6 +377,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return false;
         }
 
+
         return  true;
         // Background image
         // Event title
@@ -491,6 +493,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         DateTime currentDate = new DateTime();
         DateTime currentDateTime0 = new DateTime(currentDate.getYear(), currentDate.getMonthOfYear(), currentDate.getDayOfMonth(), 0, 0);
         int remainingDays = getDayDifference(currentDateTime0, currentEvent.getDate());
+        //TODO: I have to make the File into a Drawable. This is the file I get from the EasyImagePicker (Line 112)
+        ((RelativeLayout) findViewById(R.id.content_main_id)).setBackground(currentEvent.getBackGround());
         Log.i("remainingDays", String.valueOf(getDayDifference(currentDateTime0, currentEvent.getDate())));
         Log.i("remainingDays", String.valueOf(remainingDays));
         // Set remaining days
