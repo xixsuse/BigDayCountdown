@@ -19,6 +19,20 @@ public class TrackedEvent implements Comparable{
     protected String eventTitle;
     protected DateTime date;
     protected boolean alert;
+
+    public int getRotation() {
+        return rotation;
+    }
+
+    public void addRotation(int rotation) {
+        this.rotation += rotation;
+        if (this.rotation == 360) {
+            this.rotation = 0;
+
+        }
+    }
+
+    protected int rotation;
     // Background..
 
 

@@ -6,6 +6,9 @@ import org.joda.time.Days;
 import android.app.DialogFragment;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -123,7 +126,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onImagePicked(File imageFile, EasyImage.ImageSource source) {
                 //Handle the image
                 // Temporary store the image to later set it in the TrackedEvent object.
-                
                 tempBackground = imageFile;
             }
         });
@@ -183,6 +185,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         ImageView deleteButton = (ImageView) findViewById(R.id.deleteButton);
         deleteButton.setOnClickListener(this);
+
+        ImageView rotateButton = (ImageView) findViewById(R.id.rotateButton);
+        rotateButton.setOnClickListener(this);
 
 
     }
@@ -311,7 +316,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 deleteEvent();
                 break;
 
+            case R.id.rotateButton:
+                rotateBackground();
+                break;
+
         }
+    }
+    //Rotates background 90 degrees.
+    private void rotateBackground() {
+        Bitmap eventBG = BitmapFactory.decodeFile(currentEvent.getBackGround().getAbsolutePath());
+        eventBG = rotateImage(eventBG, currentEvent.getRotation() + 90);
+        currentEvent.addRotation(90);
+        ((ImageView) findViewById(R.id.background)).setImageBitmap(eventBG);
+    }
+
+    public static Bitmap rotateImage(Bitmap src, float degree)
+    {
+        // create new matrix
+        Matrix matrix = new Matrix();
+        // setup rotation degree
+        matrix.postRotate(degree);
+        Bitmap bmp = Bitmap.createBitmap(src, 0, 0, src.getWidth(), src.getHeight(), matrix, true);
+        return bmp;
     }
 
     protected void createAndStoreNewEvent(){
@@ -466,9 +492,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         DateTime currentDateTime0 = new DateTime(currentDate.getYear(), currentDate.getMonthOfYear(), currentDate.getDayOfMonth(), 0, 0);
         int remainingDays = getDayDifference(currentDateTime0, currentEvent.getDate());
 
-        Drawable eventBG = Drawable.createFromPath(currentEvent.getBackGround().getAbsolutePath());
-        //TODO: I have to make the File into a Drawable. This is the file I get from the EasyImagePicker (Line 112)
-        ((RelativeLayout) findViewById(R.id.content_main_id)).setBackground(eventBG);
+        Bitmap eventBG = BitmapFactory.decodeFile(currentEvent.getBackGround().getAbsolutePath());
+        Log.i("bg", String.valueOf(eventBG.getHeight()));
+        Log.i("bg", String.valueOf(eventBG.getWidth()));
+        ((ImageView) findViewById(R.id.background)).setImageBitmap(eventBG);
+
+
         Log.i("remainingDays", String.valueOf(getDayDifference(currentDateTime0, currentEvent.getDate())));
         Log.i("remainingDays", String.valueOf(remainingDays));
         // Set remaining days
@@ -571,10 +600,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             resetUI();
             updateEventDrawer();
             noEventsUI();
+
+            ((ImageView) findViewById(R.id.background)).setImageResource(R.mipmap.background);
         }
 
-
-        findViewById(R.id.content_main_id).setBackgroundResource(R.drawable.background);
 
     }
 
