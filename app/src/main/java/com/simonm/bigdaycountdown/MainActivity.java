@@ -177,8 +177,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void initViews(){
         main_view = (RelativeLayout) findViewById(R.id.content_main_id);
 
-        ImageView drawerButton = (ImageView) findViewById(R.id.menu_hint_button);
-        drawerButton.setOnClickListener(this);
 
         ImageView eDrawerButton = (ImageView) findViewById(R.id.event_hint_button);
         eDrawerButton.setOnClickListener(this);
@@ -287,6 +285,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             eventTitles = getResources().getStringArray(R.array.events_array);
         } else {
             eventTitles = new String[eventNames.size()];
+            eventNames.clear();
+            for (TrackedEvent element : myTrackedEventsList){
+                eventNames.add(element.getEventTitle());
+            }
             eventTitles = eventNames.toArray(eventTitles);
         }
         eDrawerList.setAdapter(new ArrayAdapter<>(this,
@@ -304,12 +306,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.fab_add_date:
                 createAndStoreNewEvent();
-                break;
-            case R.id.menu_hint_button:
-                Log.i("tag", "opens drawer");
-
-                // open drawer
-                mDrawerLayout.openDrawer(mDrawerList);
                 break;
 
             case R.id.event_hint_button:
@@ -365,6 +361,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void createAndStoreNewEvent(){
         EditText tempEventTitleEditText = (EditText) findViewById(R.id.new_title_id);
         newEventTitle = tempEventTitleEditText.getText().toString();
+        if (tempBackground == null){
+            tempBackground = BitmapFactory.decodeResource(getResources(), R.drawable.background);
+        }
         // DateTime days and months are 0 indexed. Handled when I set tempMonth and tempDay
         if (validateDate(tempYear, tempMonth, tempDay)) {
             tempDate = new DateTime(tempYear, tempMonth, tempDay - 1, 0, 0);
