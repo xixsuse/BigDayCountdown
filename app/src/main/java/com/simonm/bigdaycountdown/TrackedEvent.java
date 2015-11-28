@@ -1,5 +1,7 @@
 package com.simonm.bigdaycountdown;
 
+import android.graphics.Bitmap;
+
 import java.io.File;
 import java.util.Date;
 import org.joda.time.DateTime;
@@ -7,7 +9,7 @@ import org.joda.time.DateTime;
 
 public class TrackedEvent implements Comparable{
 
-    public TrackedEvent(boolean alert, String eventTitle, DateTime date, File backGround) {
+    public TrackedEvent(boolean alert, String eventTitle, DateTime date, Bitmap backGround) {
         this.alert = alert;
         this.eventTitle = eventTitle;
         this.date = date;
@@ -15,32 +17,18 @@ public class TrackedEvent implements Comparable{
     }
 
 
-    protected File backGround;
+    protected Bitmap backGround;
     protected String eventTitle;
     protected DateTime date;
     protected boolean alert;
 
-    public int getRotation() {
-        return rotation;
-    }
-
-    public void addRotation(int rotation) {
-        this.rotation += rotation;
-        if (this.rotation == 360) {
-            this.rotation = 0;
-
-        }
-    }
-
-    protected int rotation;
-    // Background..
 
 
     public boolean isAlert() {
         return alert;
     }
 
-    public File getBackGround() {
+    public Bitmap getBackGround() {
         return backGround;
     }
 

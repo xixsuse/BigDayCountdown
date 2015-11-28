@@ -27,4 +27,5 @@
     <string name="hasPassed">"has passed"</string>
     <string name="noEvents">Add a new event to track!</string>
     <string name="gallery">Gallery</string>
+    <string name="bgPreview">Background Preview</string>
 </resources>

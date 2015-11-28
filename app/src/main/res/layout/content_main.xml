@@ -22,13 +22,76 @@
         android:layout_margin="16dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
+
+    <RelativeLayout
+        android:padding="30dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/infobg"
+        android:layout_marginTop="50dp"
+        >
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Event Name!"
+        android:textSize="30sp"
+        android:textColor="@android:color/white"
         android:layout_centerHorizontal="true"
         android:id="@+id/eventName" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/noEvents"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:id="@+id/getStartedText"
+            android:textColor="@android:color/white" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textSize="80sp"
+            android:text="00"
+            android:textColor="@android:color/white"
+            android:layout_marginEnd="10dp"
+            android:id="@+id/day"
+            android:layout_below="@id/eventName"
+            android:layout_centerHorizontal="true" />
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/day"
+            android:orientation="horizontal" >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="@string/days"
+                android:id="@+id/dayText"
+                android:textColor="@android:color/white"
+                android:layout_marginEnd="5dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="@string/remainingOrHasPassed"
+                android:id="@+id/remainingOrHasPassed"
+                android:textColor="@android:color/white"
+                android:layout_toEndOf="@+id/dayText"
+                android:layout_centerHorizontal="true"/>
+        </RelativeLayout>
+
+    </RelativeLayout>
 
 
     <ImageView
@@ -50,43 +113,6 @@
         android:layout_alignParentEnd="true"
         android:scaleX="-1"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textSize="50sp"
-        android:text="00"
-        android:layout_marginEnd="10dp"
-        android:id="@+id/day"
-        android:layout_below="@id/eventName"
-        android:layout_marginTop="20dp"
-        android:layout_centerHorizontal="true" />
-
-
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@id/day"
-        android:orientation="horizontal" >
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="@string/days"
-            android:id="@+id/dayText"
-            android:layout_marginEnd="5dp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="@string/remainingOrHasPassed"
-            android:id="@+id/remainingOrHasPassed"
-            android:layout_toEndOf="@+id/dayText"
-            android:layout_centerHorizontal="true"/>
-    </RelativeLayout>
 
     <ImageView
         android:layout_width="wrap_content"
@@ -96,13 +122,6 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true" />
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/rotateButton"
-        android:src="@android:drawable/ic_menu_rotate"
-        android:layout_below="@+id/deleteButton"
-        android:layout_alignParentEnd="true" />
 
 
 </RelativeLayout>

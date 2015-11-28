@@ -1,13 +1,17 @@
 package com.simonm.bigdaycountdown;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import android.app.DialogFragment;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -45,12 +49,16 @@ import pl.aprilapps.easyphotopicker.EasyImage;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener{
 
     // Temporary variables to store values before TrackedEvent object is created and put in the List.
-    protected File tempBackground;
+    private boolean onAddDateScreen = false;
+    protected Bitmap tempBackground;
+    private int tempRotation;
     protected boolean alert;
-    protected int tempYear;
-    protected int tempMonth;
-    protected int tempDay;
+    protected int tempYear = 0;
+    protected int tempMonth = 0;
+    protected int tempDay = 0;
     protected DateTime tempDate;
+    String newEventTitle = "";
+    Bitmap eventBG;
 
     // To be used by currently chosen event
     protected File eventBackground;
@@ -126,7 +134,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onImagePicked(File imageFile, EasyImage.ImageSource source) {
                 //Handle the image
                 // Temporary store the image to later set it in the TrackedEvent object.
-                tempBackground = imageFile;
+                tempBackground = BitmapFactory.decodeFile(imageFile.getAbsolutePath());
+                ((ImageView) findViewById(R.id.backgroundPreview)).setImageBitmap(tempBackground);
             }
         });
     }
@@ -161,6 +170,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String strMonth = String.valueOf(tempMonth);
         String strDay = String.valueOf(day);
         myEventDate.setText(strYear + '-' + strMonth + '-' + strDay);
+        myEventDate.setTextColor(Color.rgb(96, 96, 96));
     }
 
 
@@ -186,8 +196,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ImageView deleteButton = (ImageView) findViewById(R.id.deleteButton);
         deleteButton.setOnClickListener(this);
 
-        ImageView rotateButton = (ImageView) findViewById(R.id.rotateButton);
-        rotateButton.setOnClickListener(this);
+        ImageView rotateRButton = (ImageView) findViewById(R.id.rotateRButton);
+        rotateRButton.setOnClickListener(this);
+
+        ImageView rotateLButton = (ImageView) findViewById(R.id.rotateLButton);
+        rotateLButton.setOnClickListener(this);
 
 
     }
@@ -286,12 +299,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()){
             case R.id.fab:
                 resetVariables();
+                onAddDateScreen = true;
                 AnimUtil.crossfade(main_view, findViewById(R.id.content_add_date_id), getResources().getInteger(android.R.integer.config_mediumAnimTime));
                 break;
             case R.id.fab_add_date:
-                AnimUtil.crossfade(findViewById(R.id.content_add_date_id), main_view, getResources().getInteger(android.R.integer.config_mediumAnimTime));
-                // Creates a new date object and displays it. (Work in progress)
-                // TODO: Create the new TrackedEvent Object!
                 createAndStoreNewEvent();
                 break;
             case R.id.menu_hint_button:
@@ -316,18 +327,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 deleteEvent();
                 break;
 
-            case R.id.rotateButton:
-                rotateBackground();
+            case R.id.rotateRButton:
+                rotateBackground(90);
+                break;
+
+            case R.id.rotateLButton:
+                rotateBackground(-90);
                 break;
 
         }
     }
     //Rotates background 90 degrees.
-    private void rotateBackground() {
-        Bitmap eventBG = BitmapFactory.decodeFile(currentEvent.getBackGround().getAbsolutePath());
-        eventBG = rotateImage(eventBG, currentEvent.getRotation() + 90);
-        currentEvent.addRotation(90);
-        ((ImageView) findViewById(R.id.background)).setImageBitmap(eventBG);
+    private void rotateBackground(int rotation) {
+        if (tempRotation == 360 || tempRotation == -360){
+            tempRotation = 0;
+        }
+        if (tempBackground == null){
+            tempBackground = BitmapFactory.decodeResource(getResources(), R.drawable.background);
+        }
+        tempBackground = rotateImage(tempBackground, rotation);
+        tempRotation = tempRotation + rotation;
+
+        ((ImageView) findViewById(R.id.backgroundPreview)).setImageBitmap(tempBackground);
+
     }
 
     public static Bitmap rotateImage(Bitmap src, float degree)
@@ -342,39 +364,61 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     protected void createAndStoreNewEvent(){
         EditText tempEventTitleEditText = (EditText) findViewById(R.id.new_title_id);
-        String newEventTitle = tempEventTitleEditText.getText().toString();
+        newEventTitle = tempEventTitleEditText.getText().toString();
         // DateTime days and months are 0 indexed. Handled when I set tempMonth and tempDay
-        tempDate = new DateTime(tempYear, tempMonth, tempDay - 1, 0, 0);
-        Log.i("day", String.valueOf(tempDay));
-        if (validateInput(newEventTitle, tempBackground, tempDate)) {
+        if (validateDate(tempYear, tempMonth, tempDay)) {
+            tempDate = new DateTime(tempYear, tempMonth, tempDay - 1, 0, 0);
 
-            TrackedEvent newEvent = new TrackedEvent(alert, newEventTitle, tempDate, tempBackground);
-            currentEvent = newEvent;
-            Log.i("tag", newEvent.getDate().toString());
-            myTrackedEventsList.add(newEvent);
-            Collections.sort(myTrackedEventsList);
+            Log.i("day", String.valueOf(tempDay));
+            if (validateInput(newEventTitle, tempBackground, tempDate)) {
 
-            eventNames.add(newEventTitle);
-            updateEventDrawer();
+                TrackedEvent newEvent = new TrackedEvent(alert, newEventTitle, tempDate, tempBackground);
+                currentEvent = newEvent;
+                Log.i("tag", newEvent.getDate().toString());
+                myTrackedEventsList.add(newEvent);
+                Collections.sort(myTrackedEventsList);
+
+                eventNames.add(newEventTitle);
+                updateEventDrawer();
+                updateUI();
+                eventNames.clear();
+                for (TrackedEvent element : myTrackedEventsList) {
+                    eventNames.add(element.getEventTitle());
+                }
+                AnimUtil.crossfade(findViewById(R.id.content_add_date_id), main_view, getResources().getInteger(android.R.integer.config_mediumAnimTime));
+                ((EditText) findViewById(R.id.new_title_id)).setHintTextColor(Color.rgb(96, 96, 96));
+                ((TextView) findViewById(R.id.new_date_id)).setTextColor(Color.rgb(96, 96, 96));
+                tempBackground = null;
+            }
         }
-        eventNames.clear();
-        for (TrackedEvent element:myTrackedEventsList){
-            eventNames.add(element.getEventTitle());
-        }
-        updateEventDrawer();
-        updateUI();
 
     }
 
+    private boolean validateDate(int tempYear, int tempMonth, int tempDay) {
+        if (tempDay == 0 || tempMonth == 0 || tempYear == 0){
+            ((TextView) findViewById(R.id.new_date_id)).setTextColor(Color.RED);
+            return false;
+        }
+        return true;
+    }
+
     private void resetVariables() {
+        tempBackground = BitmapFactory.decodeResource(getResources(), R.drawable.background);
+        ((ImageView) findViewById(R.id.backgroundPreview)).setImageBitmap(tempBackground);
+        tempBackground = null;
+        tempRotation = 0;
+        tempDate = null;
         ((TextView) findViewById(R.id.new_date_id)).setText(R.string.date);
         ((EditText) findViewById(R.id.new_title_id)).setText("");
         ((EditText) findViewById(R.id.new_title_id)).setHint(R.string.title_for_event);
     }
 
-    protected boolean validateInput(String title, File backGround, DateTime date){
+    protected boolean validateInput(String title, Bitmap backGround, DateTime date){
         //TODO:
+        Log.i("valueOfTitle", String.valueOf(title == null));
+        Log.i("valueOfTitle", String.valueOf(title.equals("")));
         if (title.equals("")){
+            ((EditText) findViewById(R.id.new_title_id)).setHintTextColor(Color.RED);
             return false;
         }
 
@@ -487,15 +531,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     protected  void updateUI(){
 
+        findViewById(R.id.getStartedText).setVisibility(View.INVISIBLE);
         ((TextView) findViewById(R.id.eventName)).setText(currentEvent.getEventTitle());
         DateTime currentDate = new DateTime();
         DateTime currentDateTime0 = new DateTime(currentDate.getYear(), currentDate.getMonthOfYear(), currentDate.getDayOfMonth(), 0, 0);
         int remainingDays = getDayDifference(currentDateTime0, currentEvent.getDate());
 
-        Bitmap eventBG = BitmapFactory.decodeFile(currentEvent.getBackGround().getAbsolutePath());
-        Log.i("bg", String.valueOf(eventBG.getHeight()));
-        Log.i("bg", String.valueOf(eventBG.getWidth()));
-        ((ImageView) findViewById(R.id.background)).setImageBitmap(eventBG);
+        ((ImageView) findViewById(R.id.background)).setImageBitmap(currentEvent.getBackGround());
 
 
         Log.i("remainingDays", String.valueOf(getDayDifference(currentDateTime0, currentEvent.getDate())));
@@ -507,6 +549,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             ((TextView) findViewById(R.id.remainingOrHasPassed)).setText(R.string.remaining);
         }
         ((TextView) findViewById(R.id.day)).setText(String.valueOf(Math.abs(remainingDays)));
+        ((TextView) findViewById(R.id.dayText)).setText(R.string.days);
     }
 
 
@@ -600,6 +643,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             resetUI();
             updateEventDrawer();
             noEventsUI();
+            findViewById(R.id.getStartedText).setVisibility(View.VISIBLE);
 
             ((ImageView) findViewById(R.id.background)).setImageResource(R.mipmap.background);
         }
@@ -608,6 +652,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void resetUI() {
+        ((EditText) findViewById(R.id.new_title_id)).setHintTextColor(Color.rgb(96, 96, 96));
+        ((TextView) findViewById(R.id.new_date_id)).setTextColor(Color.rgb(96, 96, 96));
+        newEventTitle = "";
         ((TextView) findViewById(R.id.eventName)).setText(R.string.title_for_event);
         ((TextView) findViewById(R.id.day)).setText("00");
     }
@@ -616,7 +663,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ((TextView) findViewById(R.id.eventName)).setText("");
         ((TextView) findViewById(R.id.day)).setText("");
         ((TextView) findViewById(R.id.remainingOrHasPassed)).setText("");
-        ((TextView) findViewById(R.id.dayText)).setText(R.string.noEvents);
+        ((TextView) findViewById(R.id.dayText)).setText("");
+
 
     }
 
@@ -628,5 +676,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-
+    public void onBackPressed() {
+        if (onAddDateScreen){
+            resetVariables();
+            onAddDateScreen = false;
+            AnimUtil.crossfade(findViewById(R.id.content_add_date_id), main_view, getResources().getInteger(android.R.integer.config_mediumAnimTime));
+        } else {
+            super.onBackPressed();
+        }
+    }
 }

@@ -72,7 +72,7 @@
 
         <RelativeLayout android:layout_width="match_parent"
             android:id="@+id/wrapper"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_below="@id/new_date_id"
             android:layout_marginTop="5dp"
             >
@@ -113,6 +113,50 @@
             android:layout_marginTop="5dp"
             android:layout_width="fill_parent"
             android:background="#606060" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_below="@id/wrapper"
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_centerHorizontal="true"
+            android:layout_height="250dp">
+
+            <TextView
+                android:id="@+id/bgPreviewText"
+                android:layout_width="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:layout_height="wrap_content"
+                android:text="@string/bgPreview"
+                android:layout_centerHorizontal="true"/>
+
+            <ImageView
+                android:layout_centerHorizontal="true"
+                android:layout_below="@+id/bgPreviewText"
+                android:layout_width="180dp"
+                android:layout_height="180dp"
+                android:id="@+id/backgroundPreview"
+                android:scaleType="centerCrop"
+                android:src="@mipmap/background"/>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rotateRButton"
+                android:src="@android:drawable/ic_menu_rotate"
+                android:layout_below="@+id/backgroundPreview"
+                android:layout_alignEnd="@+id/backgroundPreview" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rotateLButton"
+                android:scaleX="-1"
+                android:src="@android:drawable/ic_menu_rotate"
+                android:layout_below="@+id/backgroundPreview"
+                android:layout_alignStart="@+id/backgroundPreview" />
+
         </RelativeLayout>
 
 
