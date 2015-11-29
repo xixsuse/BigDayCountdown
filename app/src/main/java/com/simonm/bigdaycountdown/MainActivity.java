@@ -5,8 +5,11 @@ import android.app.DatePickerDialog;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import android.app.DialogFragment;
+import android.app.Fragment;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -37,6 +40,9 @@ import android.widget.TextView;
 import com.simonm.bigdaycountdown.Utils.AnimUtil;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -348,10 +354,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    public static Bitmap rotateImage(Bitmap src, float degree)
-    {
+    public static Bitmap rotateImage(Bitmap src, float degree) {
         // create new matrix
         Matrix matrix = new Matrix();
+
         // setup rotation degree
         matrix.postRotate(degree);
         Bitmap bmp = Bitmap.createBitmap(src, 0, 0, src.getWidth(), src.getHeight(), matrix, true);
@@ -388,10 +394,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 ((EditText) findViewById(R.id.new_title_id)).setHintTextColor(Color.rgb(96, 96, 96));
                 ((TextView) findViewById(R.id.new_date_id)).setTextColor(Color.rgb(96, 96, 96));
                 tempBackground = null;
+
             }
         }
 
     }
+
 
     private boolean validateDate(int tempYear, int tempMonth, int tempDay) {
         if (tempDay == 0 || tempMonth == 0 || tempYear == 0){
@@ -683,5 +691,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else {
             super.onBackPressed();
         }
+    }
+
+    private void save() throws IOException{
+
     }
 }
