@@ -40,19 +40,25 @@ import android.widget.TextView;
 import com.simonm.bigdaycountdown.Utils.AnimUtil;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.FileHandler;
 
 import pl.aprilapps.easyphotopicker.EasyImage;
 
+//TODO: Save and load. 
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener, Serializable{
 
     // Temporary variables to store values before TrackedEvent object is created and put in the List.
     private boolean onAddDateScreen = false;
@@ -98,6 +104,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private CharSequence eTitle;
     private String[] eventTitles;
 
+    String filename = "savedFile.bin";
+
 
     private RelativeLayout main_view;
 
@@ -117,6 +125,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             selectItem(0);
             selectItem(0);
         }
+
+        load();
 
         // Checking whether any dates are tracked, if not, we display a get started screen.
         startScreenCheck(getNumberOfDatesTracked(), main_view);
@@ -397,6 +407,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             }
         }
+        save();
 
     }
 
@@ -693,7 +704,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void save() throws IOException{
+    private void save(){
+        try {
+            ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(filename));
+            os.writeObject(myTrackedEventsList);
+        }
+        catch (IOException e){
+            e.printStackTrace();
 
+        }
+    }
+
+    private void load(){
+        try{
+            ObjectInputStream is = new ObjectInputStream(new FileInputStream(filename));
+            myTrackedEventsList = (ArrayList<TrackedEvent>) is.readObject();
+            updateEventDrawer();
+        } catch (IOException e){
+            e.printStackTrace();
+        } catch (ClassNotFoundException e){
+            e.printStackTrace();
+        }
     }
 }
