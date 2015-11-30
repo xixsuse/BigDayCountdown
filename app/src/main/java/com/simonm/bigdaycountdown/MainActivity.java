@@ -56,7 +56,8 @@ import java.util.logging.FileHandler;
 
 import pl.aprilapps.easyphotopicker.EasyImage;
 
-//TODO: Save and load. 
+//TODO: Background disappears during save/load.
+//TODO: Clean and comment code
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener, Serializable{
 
@@ -71,6 +72,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected DateTime tempDate;
     String newEventTitle = "";
     Bitmap eventBG;
+
+    ArrayList<TrackedEvent> myTrackedEventsList;
 
     // To be used by currently chosen event
     protected File eventBackground;
@@ -87,7 +90,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     // All current tracked dates will be stored in this arrayList.
 
-    protected ArrayList<TrackedEvent> myTrackedEventsList;
     protected List<String> eventNames = new ArrayList<>();
 
     private DrawerLayout mDrawerLayout;
@@ -126,8 +128,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             selectItem(0);
         }
 
-        load();
-
         // Checking whether any dates are tracked, if not, we display a get started screen.
         startScreenCheck(getNumberOfDatesTracked(), main_view);
 
@@ -156,18 +156,43 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
 
-    // GETTERS & SETTERS
-    public ArrayList<TrackedEvent> getMyTrackedEventsList() {
-        return myTrackedEventsList;
-    }
-
 
     // Initializes variables
     protected void initVars(){
-        if (getMyTrackedEventsList() == null){
+        Log.i("eventListBEFORE", String.valueOf(myTrackedEventsList));
+        Log.i("eventListBEFORE", String.valueOf(TrackedEvent.findById(TrackedEvent.class, Long.valueOf(1))));
+        Log.i("eventListBEFORE", String.valueOf(TrackedEvent.listAll(TrackedEvent.class)));
+        Log.i("eventListBEFORE", String.valueOf(TrackedEvent.listAll(TrackedEvent.class).size()));
+        if(TrackedEvent.listAll(TrackedEvent.class).size() == 0){
             myTrackedEventsList = new ArrayList<>();
+            Log.i("eventListWASNULL", String.valueOf(myTrackedEventsList));
+        } else {
+            myTrackedEventsList = new ArrayList<>();
+            Log.i("eventListWASNOTNULL", String.valueOf(myTrackedEventsList));
+            List<TrackedEvent> tempList = TrackedEvent.listAll(TrackedEvent.class);
+            Log.i("eventListWASNOTNULL", String.valueOf(tempList.get(0).getEventTitle()));
+            Log.i("eventListWASNOTNULL", String.valueOf(tempList.size()));
+            for (TrackedEvent event : tempList) {
+                event.updateDate();
+                event.updateImage();
+                myTrackedEventsList.add(event);
+            }
+            if (myTrackedEventsList.size() == 0){
+                noEventsUI();
+            } else {
+                currentEvent = myTrackedEventsList.get(0);
+                Log.i("eventListWASNOTNULL", String.valueOf(currentEvent));
+                Log.i("eventListWASNOTNULL", String.valueOf(currentEvent.getEventTitle()));
+                Log.i("eventListWASNOTNULL", String.valueOf(currentEvent.dateToSave));
+                Log.i("eventListWASNOTNULL", String.valueOf(currentEvent.getDate()));
+                Log.i("eventListWASNOTNULL", String.valueOf(currentEvent.imageToSave));
+                Log.i("eventListWASNOTNULL", String.valueOf(currentEvent.getBackGround()));
+                updateEventDrawer();
+                updateUI();
+            }
         }
-        // Else we already have a list containing tracked events
+
+
     }
 
     // Displays the date picker when the date field is clicked:
@@ -390,7 +415,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 TrackedEvent newEvent = new TrackedEvent(alert, newEventTitle, tempDate, tempBackground);
                 currentEvent = newEvent;
                 Log.i("tag", newEvent.getDate().toString());
-                myTrackedEventsList.add(newEvent);
+               myTrackedEventsList.add(newEvent);
                 Collections.sort(myTrackedEventsList);
 
                 eventNames.add(newEventTitle);
@@ -405,9 +430,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 ((TextView) findViewById(R.id.new_date_id)).setTextColor(Color.rgb(96, 96, 96));
                 tempBackground = null;
 
+                newEvent.saveDate();
+                newEvent.saveImage();
+                Log.i("jodaDate", String.valueOf(newEvent.getDate()));
+                newEvent.save();
+                Log.i("date", String.valueOf(newEvent.getDate()));
             }
         }
-        save();
+
 
     }
 
@@ -704,26 +734,4 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void save(){
-        try {
-            ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(filename));
-            os.writeObject(myTrackedEventsList);
-        }
-        catch (IOException e){
-            e.printStackTrace();
-
-        }
-    }
-
-    private void load(){
-        try{
-            ObjectInputStream is = new ObjectInputStream(new FileInputStream(filename));
-            myTrackedEventsList = (ArrayList<TrackedEvent>) is.readObject();
-            updateEventDrawer();
-        } catch (IOException e){
-            e.printStackTrace();
-        } catch (ClassNotFoundException e){
-            e.printStackTrace();
-        }
-    }
 }
