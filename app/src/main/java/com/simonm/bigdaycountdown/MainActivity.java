@@ -57,6 +57,7 @@ import java.util.logging.FileHandler;
 import pl.aprilapps.easyphotopicker.EasyImage;
 
 //TODO: Background disappears during save/load.
+// TODO: Try -> Save image locally and then save the path to the image using ORM.
 //TODO: Clean and comment code
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener, Serializable{
@@ -431,7 +432,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 tempBackground = null;
 
                 newEvent.saveDate();
+                Log.i("imageToSaveBEFORESAVE", String.valueOf(Utilities.getBytes(newEvent.backGround)));
                 newEvent.saveImage();
+                Log.i("imageToSaveAFTERSAVE", String.valueOf(newEvent.imageToSave));
                 Log.i("jodaDate", String.valueOf(newEvent.getDate()));
                 newEvent.save();
                 Log.i("date", String.valueOf(newEvent.getDate()));
