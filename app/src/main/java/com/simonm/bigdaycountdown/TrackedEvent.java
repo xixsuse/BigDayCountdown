@@ -3,6 +3,7 @@ package com.simonm.bigdaycountdown;
 import android.graphics.Bitmap;
 import android.util.Log;
 
+import com.orm.SugarContext;
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
 
@@ -13,27 +14,37 @@ import org.joda.time.DateTime;
 
 public class TrackedEvent extends SugarRecord implements Comparable{
 
+    protected void onCreate(){
+    }
+
     public TrackedEvent(){
 
     }
 
-    public TrackedEvent(boolean alert, String eventTitle, DateTime date, Bitmap backGround) {
+    public TrackedEvent(boolean alert, String eventTitle, DateTime date, String imagePath) {
+        this.imagePath = imagePath;
         this.alert = alert;
         this.eventTitle = eventTitle;
         this.date = date;
-        this.backGround = backGround;
     }
 
 
     @Ignore
-    protected Bitmap backGround;
-    @Ignore
     protected DateTime date;
 
     protected String eventTitle;
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
+
+    protected String imagePath;
     protected boolean alert;
     protected Date dateToSave;
-    protected byte[] imageToSave;
 
     public void saveDate(){
         dateToSave = date.toDate();
@@ -44,23 +55,12 @@ public class TrackedEvent extends SugarRecord implements Comparable{
         date = new DateTime(dateToSave);
     }
 
-    public void saveImage(){
-        imageToSave = Utilities.getBytes(backGround);
-    }
-
-    public void updateImage(){
-        backGround = Utilities.getImage(imageToSave);
-    }
-
 
 
     public boolean isAlert() {
         return alert;
     }
 
-    public Bitmap getBackGround() {
-        return backGround;
-    }
 
     public String getEventTitle() {
         return eventTitle;

@@ -37,6 +37,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.orm.SugarContext;
 import com.simonm.bigdaycountdown.Utils.AnimUtil;
 
 import java.io.File;
@@ -56,8 +57,8 @@ import java.util.logging.FileHandler;
 
 import pl.aprilapps.easyphotopicker.EasyImage;
 
-//TODO: Background disappears during save/load.
-// TODO: Try -> Save image locally and then save the path to the image using ORM.
+//TODO: Deleting Events needs to delete it from the database aswell! :)
+//TODO: EventDrawer bugs after creating 2 events -> Deletign 1 and restarting app.
 //TODO: Clean and comment code
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener, Serializable{
@@ -65,6 +66,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // Temporary variables to store values before TrackedEvent object is created and put in the List.
     private boolean onAddDateScreen = false;
     protected Bitmap tempBackground;
+    protected Bitmap standardBackground;
+
+    protected String tempImagePath;
     private int tempRotation;
     protected boolean alert;
     protected int tempYear = 0;
@@ -112,12 +116,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private RelativeLayout main_view;
 
+    Context Context;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
 
+        standardBackground = BitmapFactory.decodeResource(getResources(), R.drawable.background);
         initViews();
         setupLeftDrawer();
         setupRightDrawer();
@@ -136,6 +144,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
 
+
     // For the background selection
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -151,6 +160,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onImagePicked(File imageFile, EasyImage.ImageSource source) {
                 //Handle the image
                 // Temporary store the image to later set it in the TrackedEvent object.
+                tempImagePath = imageFile.getAbsolutePath();
                 tempBackground = BitmapFactory.decodeFile(imageFile.getAbsolutePath());
                 ((ImageView) findViewById(R.id.backgroundPreview)).setImageBitmap(tempBackground);
             }
@@ -161,7 +171,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // Initializes variables
     protected void initVars(){
         Log.i("eventListBEFORE", String.valueOf(myTrackedEventsList));
-        Log.i("eventListBEFORE", String.valueOf(TrackedEvent.findById(TrackedEvent.class, Long.valueOf(1))));
         Log.i("eventListBEFORE", String.valueOf(TrackedEvent.listAll(TrackedEvent.class)));
         Log.i("eventListBEFORE", String.valueOf(TrackedEvent.listAll(TrackedEvent.class).size()));
         if(TrackedEvent.listAll(TrackedEvent.class).size() == 0){
@@ -175,8 +184,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Log.i("eventListWASNOTNULL", String.valueOf(tempList.size()));
             for (TrackedEvent event : tempList) {
                 event.updateDate();
-                event.updateImage();
                 myTrackedEventsList.add(event);
+
             }
             if (myTrackedEventsList.size() == 0){
                 noEventsUI();
@@ -186,8 +195,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Log.i("eventListWASNOTNULL", String.valueOf(currentEvent.getEventTitle()));
                 Log.i("eventListWASNOTNULL", String.valueOf(currentEvent.dateToSave));
                 Log.i("eventListWASNOTNULL", String.valueOf(currentEvent.getDate()));
-                Log.i("eventListWASNOTNULL", String.valueOf(currentEvent.imageToSave));
-                Log.i("eventListWASNOTNULL", String.valueOf(currentEvent.getBackGround()));
                 updateEventDrawer();
                 updateUI();
             }
@@ -381,7 +388,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             tempRotation = 0;
         }
         if (tempBackground == null){
-            tempBackground = BitmapFactory.decodeResource(getResources(), R.drawable.background);
+            tempBackground = standardBackground;
         }
         tempBackground = rotateImage(tempBackground, rotation);
         tempRotation = tempRotation + rotation;
@@ -404,16 +411,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         EditText tempEventTitleEditText = (EditText) findViewById(R.id.new_title_id);
         newEventTitle = tempEventTitleEditText.getText().toString();
         if (tempBackground == null){
-            tempBackground = BitmapFactory.decodeResource(getResources(), R.drawable.background);
+            tempBackground = standardBackground;
         }
         // DateTime days and months are 0 indexed. Handled when I set tempMonth and tempDay
         if (validateDate(tempYear, tempMonth, tempDay)) {
             tempDate = new DateTime(tempYear, tempMonth, tempDay - 1, 0, 0);
 
             Log.i("day", String.valueOf(tempDay));
-            if (validateInput(newEventTitle, tempBackground, tempDate)) {
+            if (validateInput(newEventTitle, tempImagePath, tempDate)) {
 
-                TrackedEvent newEvent = new TrackedEvent(alert, newEventTitle, tempDate, tempBackground);
+                TrackedEvent newEvent = new TrackedEvent(alert, newEventTitle, tempDate, tempImagePath);
                 currentEvent = newEvent;
                 Log.i("tag", newEvent.getDate().toString());
                myTrackedEventsList.add(newEvent);
@@ -429,12 +436,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 AnimUtil.crossfade(findViewById(R.id.content_add_date_id), main_view, getResources().getInteger(android.R.integer.config_mediumAnimTime));
                 ((EditText) findViewById(R.id.new_title_id)).setHintTextColor(Color.rgb(96, 96, 96));
                 ((TextView) findViewById(R.id.new_date_id)).setTextColor(Color.rgb(96, 96, 96));
-                tempBackground = null;
+                tempBackground = standardBackground;
 
                 newEvent.saveDate();
-                Log.i("imageToSaveBEFORESAVE", String.valueOf(Utilities.getBytes(newEvent.backGround)));
-                newEvent.saveImage();
-                Log.i("imageToSaveAFTERSAVE", String.valueOf(newEvent.imageToSave));
                 Log.i("jodaDate", String.valueOf(newEvent.getDate()));
                 newEvent.save();
                 Log.i("date", String.valueOf(newEvent.getDate()));
@@ -454,9 +458,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void resetVariables() {
-        tempBackground = BitmapFactory.decodeResource(getResources(), R.drawable.background);
+        if (tempBackground == null) {
+            tempBackground = standardBackground;
+        }
         ((ImageView) findViewById(R.id.backgroundPreview)).setImageBitmap(tempBackground);
-        tempBackground = null;
+        tempBackground = standardBackground;
         tempRotation = 0;
         tempDate = null;
         ((TextView) findViewById(R.id.new_date_id)).setText(R.string.date);
@@ -464,7 +470,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ((EditText) findViewById(R.id.new_title_id)).setHint(R.string.title_for_event);
     }
 
-    protected boolean validateInput(String title, Bitmap backGround, DateTime date){
+    protected boolean validateInput(String title, String backgroundPath, DateTime date){
         //TODO:
         Log.i("valueOfTitle", String.valueOf(title == null));
         Log.i("valueOfTitle", String.valueOf(title.equals("")));
@@ -588,7 +594,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         DateTime currentDateTime0 = new DateTime(currentDate.getYear(), currentDate.getMonthOfYear(), currentDate.getDayOfMonth(), 0, 0);
         int remainingDays = getDayDifference(currentDateTime0, currentEvent.getDate());
 
-        ((ImageView) findViewById(R.id.background)).setImageBitmap(currentEvent.getBackGround());
+        ((ImageView) findViewById(R.id.background)).setImageBitmap(BitmapFactory.decodeFile(currentEvent.getImagePath()));
 
 
         Log.i("remainingDays", String.valueOf(getDayDifference(currentDateTime0, currentEvent.getDate())));

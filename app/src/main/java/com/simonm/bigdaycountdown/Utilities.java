@@ -19,4 +19,6 @@ public class Utilities {
         return BitmapFactory.decodeByteArray(image, 0, image.length);
     }
 
+
+
 }

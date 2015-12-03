@@ -11,6 +11,7 @@
         android:name="com.orm.SugarApp"
         >
 
+        <meta-data android:name="DOMAIN_PACKAGE_NAME" android:value="com.simonm.bigdaycountdown" />
         <meta-data android:name="DATABASE" android:value="dbtest.db" />
         <meta-data android:name="VERSION" android:value="3" />
         <meta-data android:name="QUERY_LOG" android:value="true" />
