@@ -126,6 +126,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         standardBackground = BitmapFactory.decodeResource(getResources(), R.drawable.background);
+        tempBackground = standardBackground;
         initViews();
         setupLeftDrawer();
         setupRightDrawer();
@@ -330,16 +331,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void updateEventDrawer() {
-        if (eventNames.size() == 0) {
-            eventTitles = getResources().getStringArray(R.array.events_array);
-        } else {
-            eventTitles = new String[eventNames.size()];
-            eventNames.clear();
-            for (TrackedEvent element : myTrackedEventsList){
-                eventNames.add(element.getEventTitle());
-            }
-            eventTitles = eventNames.toArray(eventTitles);
+        Log.i("Delete", "got to UpdateDrawer");
+        eventNames.clear();
+        for (TrackedEvent element : myTrackedEventsList){
+            Log.i("EventDrawer", "added" + " " + element.getEventTitle());
+            eventNames.add(element.getEventTitle());
         }
+        eventTitles = eventNames.toArray(eventTitles);
+        Log.i("Delete", "Please crash before this");
         eDrawerList.setAdapter(new ArrayAdapter<>(this,
                 R.layout.drawer_list_item, eventTitles));
     }
@@ -594,8 +593,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         DateTime currentDateTime0 = new DateTime(currentDate.getYear(), currentDate.getMonthOfYear(), currentDate.getDayOfMonth(), 0, 0);
         int remainingDays = getDayDifference(currentDateTime0, currentEvent.getDate());
 
-        ((ImageView) findViewById(R.id.background)).setImageBitmap(BitmapFactory.decodeFile(currentEvent.getImagePath()));
-
+        if (currentEvent.getImagePath() != null) {
+            ((ImageView) findViewById(R.id.background)).setImageBitmap(BitmapFactory.decodeFile(currentEvent.getImagePath()));
+        } else {
+            ((ImageView) findViewById(R.id.background)).setImageBitmap(standardBackground);
+        }
 
         Log.i("remainingDays", String.valueOf(getDayDifference(currentDateTime0, currentEvent.getDate())));
         Log.i("remainingDays", String.valueOf(remainingDays));
@@ -611,7 +613,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private int getDayDifference(DateTime start, DateTime end) {
-        Log.i("FirtDay", String.valueOf(start));
+        Log.i("FirstDay", String.valueOf(start));
         Log.i("LastDay", String.valueOf(end));
         Log.i("daysBetween", String.valueOf(Days.daysBetween(new DateTime(start), new DateTime(end)).getDays()));
         return Days.daysBetween(start, end).getDays();
@@ -684,9 +686,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     protected void deleteEvent(){
+
         if (currentEvent != null) {
             eventNames.remove(currentEvent.getEventTitle());
+
+            //TODO: This line somehow crashes the program long after it has been executed, I have no idea why.
             myTrackedEventsList.remove(currentEvent);
+
+            currentEvent.delete();
+            Log.i("Delete", "got past delete();");
             currentEvent = null;
             Collections.sort(myTrackedEventsList);
             if (myTrackedEventsList.size() > 0){
@@ -732,6 +740,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             ((TextView) findViewById(R.id.dayText)).setText(R.string.days);
         }
     }
+
 
     public void onBackPressed() {
         if (onAddDateScreen){
