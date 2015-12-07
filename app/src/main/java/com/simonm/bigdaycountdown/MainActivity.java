@@ -50,6 +50,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -67,6 +68,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private boolean onAddDateScreen = false;
     protected Bitmap tempBackground;
     protected Bitmap standardBackground;
+
+    protected TrackedEvent deletedEvent;
 
     protected String tempImagePath;
     private int tempRotation;
@@ -128,13 +131,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         standardBackground = BitmapFactory.decodeResource(getResources(), R.drawable.background);
         tempBackground = standardBackground;
         initViews();
-        setupLeftDrawer();
+     /*   setupLeftDrawer();*/
         setupRightDrawer();
         initVars();
         checkEventsEmpty();
 
         if (savedInstanceState == null) {
-            selectItem(0);
             selectItem(0);
         }
 
@@ -254,7 +256,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    private void setupLeftDrawer(){
+    /*private void setupLeftDrawer(){
         menuTitles = getResources().getStringArray(R.array.menu_array);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
@@ -271,11 +273,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // ActionBarDrawerToggle ties together the the proper interactions
         // between the sliding drawer and the action bar app icon
         mDrawerToggle = new ActionBarDrawerToggle(
-                this,                  /* host Activity */
-                mDrawerLayout,         /* DrawerLayout object */
-                null,  /* Don't have a toolbar */
-                R.string.drawer_open,  /* "open drawer" description for accessibility */
-                R.string.drawer_close  /* "close drawer" description for accessibility */
+                this,                  *//* host Activity *//*
+                mDrawerLayout,         *//* DrawerLayout object *//*
+                null,  *//* Don't have a toolbar *//*
+                R.string.drawer_open,  *//* "open drawer" description for accessibility *//*
+                R.string.drawer_close  *//* "close drawer" description for accessibility *//*
         )
         {
             public void onDrawerClosed(View view) {
@@ -287,7 +289,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
-    }
+    }*/
 
     private void setupRightDrawer(){
         // TODO: Change this to hold the events instead
@@ -354,6 +356,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.fab_add_date:
                 createAndStoreNewEvent();
+                tempBackground = standardBackground;
                 break;
 
             case R.id.event_hint_button:
@@ -409,8 +412,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void createAndStoreNewEvent(){
         EditText tempEventTitleEditText = (EditText) findViewById(R.id.new_title_id);
         newEventTitle = tempEventTitleEditText.getText().toString();
-        if (tempBackground == null){
-            tempBackground = standardBackground;
+        if (tempImagePath.equals("")){
+            tempImagePath = null;
         }
         // DateTime days and months are 0 indexed. Handled when I set tempMonth and tempDay
         if (validateDate(tempYear, tempMonth, tempDay)) {
@@ -435,7 +438,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 AnimUtil.crossfade(findViewById(R.id.content_add_date_id), main_view, getResources().getInteger(android.R.integer.config_mediumAnimTime));
                 ((EditText) findViewById(R.id.new_title_id)).setHintTextColor(Color.rgb(96, 96, 96));
                 ((TextView) findViewById(R.id.new_date_id)).setTextColor(Color.rgb(96, 96, 96));
-                tempBackground = standardBackground;
 
                 newEvent.saveDate();
                 Log.i("jodaDate", String.valueOf(newEvent.getDate()));
@@ -444,6 +446,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
 
+        tempBackground = standardBackground;
+        tempImagePath = "";
 
     }
 
@@ -457,9 +461,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void resetVariables() {
-        if (tempBackground == null) {
-            tempBackground = standardBackground;
-        }
         ((ImageView) findViewById(R.id.backgroundPreview)).setImageBitmap(tempBackground);
         tempBackground = standardBackground;
         tempRotation = 0;
@@ -530,7 +531,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         // If the nav drawer is open, hide action items related to the content view
-        boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
+   /*     boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);*/
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -559,8 +560,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (this.name.equals("events")){
                 selectEventItem(position);
 
-            } else if (this.name.equals("menu")){
-                selectItem(position);
             }
         }
     }
@@ -568,8 +567,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void selectItem(int position) {
 
         // Update, then close the drawer
-        mDrawerList.setItemChecked(position, true);
-        mDrawerLayout.closeDrawer(mDrawerList);
+    /*    mDrawerList.setItemChecked(position, true);*/
+      /*  mDrawerLayout.closeDrawer(mDrawerList);*/
     }
 
     private void selectEventItem(int position) {
@@ -629,7 +628,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         // Sync the toggle state after onRestoreInstanceState has occurred.
-        mDrawerToggle.syncState();
+       /* mDrawerToggle.syncState();*/
     }
 
     @Override
@@ -690,29 +689,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (currentEvent != null) {
             eventNames.remove(currentEvent.getEventTitle());
 
+
             //TODO: This line somehow crashes the program long after it has been executed, I have no idea why.
             myTrackedEventsList.remove(currentEvent);
 
+
             currentEvent.delete();
-            Log.i("Delete", "got past delete();");
             currentEvent = null;
             Collections.sort(myTrackedEventsList);
+
+            // If I remove the entire block below -> no crash.
+            // If I remove parts of it crash. weird.
+
+            Log.i("DeleteProbSize", String.valueOf(myTrackedEventsList.size()));
+
             if (myTrackedEventsList.size() > 0){
+                Log.i("DeleteProb", ">0");
                 currentEvent = myTrackedEventsList.get(0);
                 updateUI();
+            } else {
+                Log.i("DeleteProb", "else");
+                resetUI();
+                updateEventDrawer();
+                noEventsUI();
+                findViewById(R.id.getStartedText).setVisibility(View.VISIBLE);
+
+                ((ImageView) findViewById(R.id.background)).setImageResource(R.mipmap.background);
             }
-            updateEventDrawer();
+            setupRightDrawer();
+
         }
 
-        if (myTrackedEventsList.size() == 0){
-            resetUI();
-            updateEventDrawer();
-            noEventsUI();
-            findViewById(R.id.getStartedText).setVisibility(View.VISIBLE);
-
-            ((ImageView) findViewById(R.id.background)).setImageResource(R.mipmap.background);
-        }
-
+        // End of block
 
     }
 
