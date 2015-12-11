@@ -7,8 +7,9 @@
         android:allowBackup="true"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
+        android:theme="@style/AppTheme.NoActionBar"
         android:name="com.orm.SugarApp"
+
         >
 
         <meta-data android:name="DOMAIN_PACKAGE_NAME" android:value="com.simonm.bigdaycountdown" />

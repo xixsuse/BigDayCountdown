@@ -1,5 +1,6 @@
 package com.simonm.bigdaycountdown;
 
+import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import org.joda.time.DateTime;
@@ -126,6 +127,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         super.onCreate(savedInstanceState);
 
+        hideStatusbar();
+
         setContentView(R.layout.activity_main);
 
         standardBackground = BitmapFactory.decodeResource(getResources(), R.drawable.background);
@@ -145,7 +148,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-
+    private void hideStatusbar() {
+        // Hide statusbar
+        View decorView = getWindow().getDecorView();
+// Hide the status bar.
+        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
+    }
 
 
     // For the background selection
@@ -326,6 +335,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
 
             public void onDrawerOpened(View drawerView) {
+                hideStatusbar();
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
         };
@@ -412,7 +422,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void createAndStoreNewEvent(){
         EditText tempEventTitleEditText = (EditText) findViewById(R.id.new_title_id);
         newEventTitle = tempEventTitleEditText.getText().toString();
-        if (tempImagePath.equals("")){
+        if (tempImagePath == null || tempImagePath.equals("")){
             tempImagePath = null;
         }
         // DateTime days and months are 0 indexed. Handled when I set tempMonth and tempDay
