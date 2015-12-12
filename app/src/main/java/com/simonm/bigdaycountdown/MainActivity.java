@@ -59,8 +59,6 @@ import java.util.logging.FileHandler;
 
 import pl.aprilapps.easyphotopicker.EasyImage;
 
-//TODO: Deleting Events needs to delete it from the database aswell! :)
-//TODO: EventDrawer bugs after creating 2 events -> Deletign 1 and restarting app.
 //TODO: Clean and comment code
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener, Serializable{
@@ -700,7 +698,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             eventNames.remove(currentEvent.getEventTitle());
 
 
-            //TODO: This line somehow crashes the program long after it has been executed, I have no idea why.
             myTrackedEventsList.remove(currentEvent);
 
 
