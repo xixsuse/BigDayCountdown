@@ -60,6 +60,7 @@ import java.util.logging.FileHandler;
 import pl.aprilapps.easyphotopicker.EasyImage;
 
 //TODO: Clean and comment code
+//TODO: Optimize bitmap handling. (This is really bad)
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener, Serializable{
 
